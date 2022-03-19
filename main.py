@@ -1,8 +1,8 @@
-# This is the main file of our 'Ecosysteme' project 
+# This is the main file of our 'Ecosysteme' project
 # Here is the list of commands needed to save the changes and update the files to Github.com
 # git add .
 # git commit -m "Ecrire un message résumant les changemets"
-# git push  
+# git push
 
 ###########
 # MODULES #
@@ -17,44 +17,46 @@ import random
 ###########
 
 # INITIALISATION
-pygame.init() # Initiation of pygame -> mandatory
+pygame.init()  # Initiation of pygame -> mandatory
 
 # CREATION OF THE WINDOW
-window_edge = 600 # in pixels -> wanted edge size for the display window
-main_window = pygame.display.set_mode((window_edge,window_edge)) # Creation of the main window -> size : window_surface x window_surface
-bg_color = (255,255,255) # WHITE for the background color
-main_window.fill(bg_color) # Colouring the window
+window_edge = 600  # in pixels -> wanted edge size for the display window
+# Creation of the main window -> size : window_surface x window_surface
+main_window = pygame.display.set_mode((window_edge, window_edge))
+bg_color = (255, 255, 255)  # WHITE for the background color
+main_window.fill(bg_color)  # Colouring the window
 
 # MANAGING CELLS
-first_cell = cell.Cell(window_edge//2,window_edge//2) # Creating a cell in the middle of our window
+# Creating a cell in the middle of our window
+first_cell = cell.Cell(window_edge//2, window_edge//2)
 cells_list = [first_cell]
-main_window.fill(first_cell.color,first_cell.attributes)
+main_window.fill(first_cell.color, first_cell.attributes)
 
 # GAME LOOP
 while True:
-    event = pygame.event.poll() # Collecting an event from the user 
-            
-    # The loop (and the code) terminates if the user click on the close button of the window
+    event = pygame.event.poll()  # Collecting an event from the user
+
+    # The loop (and the code) terminates if the user click on the close button
+    # of the window
     if event.type == pygame.QUIT:
         break
 
-    main_window.fill(bg_color) # Resetting the window blank
+    main_window.fill(bg_color)  # Resetting the window blank
     for cells in cells_list:
         cells.moving()
 
-        replication_proba = random.random() # Random number between 0 and 1 -> if < growth_rate then the cell replicates itself
-        if  replication_proba <= cells.growth_rate: # Determines the probability for the cell to replicates itself
+        # Random number between 0 and 1 -> if < growth_rate then the cell
+        # replicates itself
+        replication_proba = random.random()
+        # Determines the probability for the cell to replicates itself
+        if replication_proba <= cells.growth_rate:
             new_cell = cells.replication()
-            cells_list.append(new_cell) # Adding the new cell to the list
+            cells_list.append(new_cell)  # Adding the new cell to the list
         else:
             pass
-        
-        main_window.fill(cells.color,cells.attributes)
-    
-    pygame.display.flip() # Displaying the window continuously
-    
-pygame.quit() # Closing the window if leaving the loop
-    
 
+        main_window.fill(cells.color, cells.attributes)
 
-    
+    pygame.display.flip()  # Displaying the window continuously
+
+pygame.quit()  # Closing the window if leaving the loop
