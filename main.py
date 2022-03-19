@@ -10,6 +10,7 @@
 import pygame
 import time
 import cell
+import random
 
 ###########
 # MAIN CODE #
@@ -24,8 +25,9 @@ main_window = pygame.display.set_mode((window_edge,window_edge)) # Creation of t
 bg_color = (255,255,255) # WHITE for the background color
 main_window.fill(bg_color) # Colouring the window
 
-# ADDING A CELL TO THE ENVIRONMENT
+# MANAGING CELLS
 first_cell = cell.Cell(window_edge//2,window_edge//2) # Creating a cell in the middle of our window
+cells_list = [first_cell]
 main_window.fill(first_cell.color,first_cell.attributes)
 
 # GAME LOOP
@@ -35,9 +37,19 @@ while True:
     # The loop (and the code) terminates if the user click on the close button of the window
     if event.type == pygame.QUIT:
         break
+
     main_window.fill(bg_color) # Resetting the window blank
-    first_cell.moving() # Moving the cell to the right (for now)
-    main_window.fill(first_cell.color,first_cell.attributes)
+    for cells in cells_list:
+        cells.moving()
+
+        replication_proba = random.random() # Random number between 0 and 1 -> if < growth_rate then the cell replicates itself
+        if  replication_proba <= cells.growth_rate: # Determines the probability for the cell to replicates itself
+            new_cell = cells.replication()
+            cells_list.append(new_cell) # Adding the new cell to the list
+        else:
+            pass
+        
+        main_window.fill(cells.color,cells.attributes)
     
     pygame.display.flip() # Displaying the window continuously
     

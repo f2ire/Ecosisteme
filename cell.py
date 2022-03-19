@@ -16,7 +16,7 @@ class Cell:
     color = (0,0,255)
     
     mvmt_speed = 0.1 # The number of pixels the cell is capable of moving in one iteration of the game loop
-    growth_rate = 0.00001 # The number of times the cell replicates itself in one iteration of the game loop
+    growth_rate = 0.0001 # The number of times the cell replicates itself in one iteration of the game loop
     
 
 
@@ -44,8 +44,20 @@ class Cell:
         self.attributes = (self.x, self.y, self.length, self.width)
     
     def replication(self):
-        pass
-
+        """
+        The cell makes a copy of itself in one direction accessible around it, this method returns the daughter cell. 
+        The number of copy realised is defined by the growth rate.
+        """
+        
+        random_direction = random.randint(0,3) # The daughter cell is made in a random direction around mother cell
+        if random_direction == 0: # Daughter cell is made on top of the mother cell
+            return Cell(self.x,self.y-10)
+        if random_direction == 1: # Daughter cell is made on the bottom of the mother cell
+            return Cell(self.x,self.y+10)
+        if random_direction == 2: # Daughter cell is made on the right of the mother cell
+            return Cell(self.x+10,self.y)
+        if random_direction == 3: # Daughter cell is made on the left of the mother cell
+            return Cell(self.x-10,self.y)
 
 
 ###########
