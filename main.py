@@ -47,7 +47,7 @@ bg_color = (255, 255, 255)  # WHITE for the background color
 main_window.fill(bg_color)  # Colouring the window
 
 # CREATION OF THE ENVIRONMENT GRID
-environment_grid = makeEnvironmentGrid(window_edge,window_edge)
+environment_grid = makeEnvironmentGrid(window_edge,window_edge) 
 
 # MANAGING CELLS
 # Creating a cell in the middle of our window

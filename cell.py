@@ -49,6 +49,7 @@ class Cell:
         self.y += self.mvmt_speed * random_direction[1]
         self.attributes = (self.x, self.y, self.length, self.width)
 
+
     def isReplicating(self):
         """
         Returns True if the cell replicates itself based on its growth_rate
@@ -90,6 +91,8 @@ class Cell:
             (1-alpha)*self.birth_color[2] + alpha*self.death_color[2]
         )
 
+    def occupyingEnvironment(self):
+        pass
 
 #############
 # MAIN CODE #
