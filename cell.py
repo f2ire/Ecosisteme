@@ -3,6 +3,7 @@
 ###########
 import random
 import tools.direction as dir
+import environment
 
 
 class Cell:
@@ -23,9 +24,9 @@ class Cell:
     growth_rate = 1/4000
 
     # The oldest age a cell can be. This number is chosen randomly between 6000 and 10000 to simulates diversity
-    max_age = random.randint(8000,14000)
+    max_age = random.randint(6000,10000)
 
-
+    # FONDAMENTAL METHODS
     def __init__(self, pos_x=0, pos_y=0):
         # The starting position of the cell
         self.x = pos_x
@@ -38,7 +39,7 @@ class Cell:
         self.age = 0
         self.color = self.birth_color
 
-
+    # OTHER METHODS
     def moving(self):
         """
         Makes the cell move randomly (for the moment) in one direction if possible

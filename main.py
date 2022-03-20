@@ -8,19 +8,33 @@
 # MODULES #
 ###########
 import pygame
-import time
 import cell
-import random
+import environment
 import data_logger
 
 #############
 # FUNCTIONS #
 #############
+def makeEnvironmentGrid(length,width):
+    """
+    Creates and returns a list of size length, containing lists of size width
+    length and width should be integers
+    """
+    # The grid
+    environment_grid = []
+    for i in range(length):
+        row = []
+        for j in range(width):
+            row.append(environment.environmental_unit(i,j))
+            j += 1
+        environment_grid.append(row)
+        i += 1
+    
+    return environment_grid
 
-
-###########
+#############
 # MAIN CODE #
-###########
+#############
 
 # INITIALISATION
 pygame.init()  # Initiation of pygame -> mandatory
@@ -31,6 +45,9 @@ window_edge = 600  # in pixels -> wanted edge size for the display window
 main_window = pygame.display.set_mode((window_edge, window_edge))
 bg_color = (255, 255, 255)  # WHITE for the background color
 main_window.fill(bg_color)  # Colouring the window
+
+# CREATION OF THE ENVIRONMENT GRID
+environment_grid = makeEnvironmentGrid(window_edge,window_edge)
 
 # MANAGING CELLS
 # Creating a cell in the middle of our window
@@ -57,7 +74,7 @@ while True:
     break
   else:
     for cells in cells_list:
-    # Determine if cells shoudl die from age
+    # Determine if cells should die from age
         if cells.isTooOld(): # Yes -> removes the cell from the list and the loop goes directly on the next cell
             cells_list.remove(cells)
             break
@@ -85,6 +102,6 @@ while True:
 
   pygame.display.flip()  # Displaying the window continuously
 
-logger.draw_cell_number_by_time()
+logger.draw_cell_number_by_time() # Displaying the graph of the number of cells over time
 
 pygame.quit()  # Closing the window if leaving the loop

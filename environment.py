@@ -16,8 +16,8 @@ class environmental_unit:
   This element remembers if it is emppty or occupied
   """
   # Dimensions and color of the unit
-  (length, width) = (1,1)
-  color = (255,255,255)
+  (length, width) = (1,1) # 1x1 square
+  color = (255,255,255) # WHITE
   
   # Boolean attribute telling if the unit is occupied by another element of the ecosystem or not
   is_occupied = False
@@ -32,6 +32,10 @@ class environmental_unit:
     # Attributes is in this rectangle tuple format to fit to the pygame.fill() method which fills rectangle objects 
     self.attributes = (self.x,self.y,self.length,self.width)
     
+
+  # OTHER METHODS
+  def isOccupied(self):
+    pass
 
 
 
