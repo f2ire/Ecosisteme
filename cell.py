@@ -1,5 +1,5 @@
 ###########
-# MODULES #
+# MODULES # 
 ###########
 import random
 import tools.direction as dir
@@ -13,23 +13,32 @@ class Cell:
     """
     # The dimensions of the cell for the display in the pygame window ->
     # a small blue square of 10x10 pixels
-    (length, width) = (10, 100)
+    (length, width) = (10, 10)
     birth_color = (255, 102, 0)
     death_color = (0, 12, 255)
 
     # The number of pixels the cell is capable of moving in one iteration of the game loop
-    mvmt_speed = 2
+    mvmt_speed = 0.5
+
     # The number of times the cell replicates itself in one iteration of the game loop
     growth_rate = 1/4000
+
+    # The oldest age a cell can be. This number is chosen randomly between 5000 and 10000 to simulates diversity
+    max_age = random.randint(5000,10000)
+
 
     def __init__(self, pos_x=0, pos_y=0):
         # The starting position of the cell
         self.x = pos_x
         self.y = pos_y
+
         # Attributes is in this rectangle tuple format to fit to the pygame.fill() method which fills rectangle objects
+        self.attributes = (self.x, self.y, self.length, self.width)
+
+        # When a cell is created, it age is set on 0. The cell is aging over time and it color is changing with it age
         self.age = 0
         self.color = self.birth_color
-        self.attributes = (self.x, self.y, self.length, self.width)
+
 
     def moving(self):
         """
@@ -39,6 +48,7 @@ class Cell:
         self.x += self.mvmt_speed * random_direction[0]
         self.y += self.mvmt_speed * random_direction[1]
         self.attributes = (self.x, self.y, self.length, self.width)
+
 
     def replication(self):
         """
@@ -51,11 +61,12 @@ class Cell:
         new_y = self.y + 10 * random_direction[1]
         return Cell(new_x, new_y)
 
+
     def adapt_color(self):
         """
         Linear interpolation to determine the cell's color depends of age
         """
-        alpha = self.age/5000
+        alpha = self.age/self.max_age
         self.color = (
             (1-alpha)*self.birth_color[0] + alpha*self.death_color[0],
             (1-alpha)*self.birth_color[1] + alpha*self.death_color[1],
@@ -63,9 +74,9 @@ class Cell:
         )
 
 
-        ###########
-        # MAIN CODE #
-        ###########
+#############
+# MAIN CODE #
+#############
 if __name__ == '__main__':
     cell1 = Cell(50, 50,)
     for i in range(50):

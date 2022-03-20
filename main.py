@@ -2,7 +2,7 @@
 # Here is the list of commands needed to save the changes and update the files to Github.com
 # git add .
 # git commit -m "Ecrire un message résumant les changemets"
-# git push
+# git push 
 
 ###########
 # MODULES #
@@ -12,6 +12,34 @@ import time
 import cell
 import random
 import data_logger
+
+#############
+# FUNCTIONS #
+#############
+def isReplicating(cell):
+  """
+  Returns True if the cell is gonna replicates itselfs.
+  """
+  # Random number between 0 and 1 -> if < growth_rate then the cell
+  # replicates itself
+  replication_proba = random.random()
+
+  if replication_proba <= cell.growth_rate:
+    return True
+    
+  else:
+    return False
+
+
+def isTooOld(cell):
+  """
+  Returns True if the cell's age is equal to it max_age
+  """
+  if cell.age > cell.max_age:
+    return True
+  else:
+    return False
+
 
 ###########
 # MAIN CODE #
@@ -38,37 +66,45 @@ logger = data_logger.DataLogger(cells_list)
 # GAME LOOP
 i = 0
 while True:
-    event = pygame.event.poll()  # Collecting an event from the user
+  event = pygame.event.poll()  # Collecting an event from the user
 
-    # The loop (and the code) terminates if the user click on the close button
-    # of the window
-    if event.type == pygame.QUIT:
-        break
+  # The loop (and the code) terminates if the user click on the close button
+  # of the window
+  if event.type == pygame.QUIT:
+    break
 
-    main_window.fill(bg_color)  # Resetting the window blank
+  main_window.fill(bg_color)  # Resetting the window blank
 
-    for cells in cells_list:
-        cells.moving()
-        # Random number between 0 and 1 -> if < growth_rate then the cell
-        # replicates itself
-        replication_proba = random.random()
-        # Determines the probability for the cell to replicates itself
-        if replication_proba <= cells.growth_rate:
-            new_cell = cells.replication()
-            cells_list.append(new_cell)  # Adding the new cell to the list
-        else:
-            pass
-        cells.age += 1
+  for cells in cells_list:
+    # Determine if cells shoudl die from age
+    if isTooOld(cells): # Yes -> removes the cell from the list and the loop goes directly on the next cell
+      cells_list.remove(cells)
+      break
+    else: # No -> cells is aging, moving and maybe replicating
+      # cells is aging
+      cells.age += 1
 
-        main_window.fill(cells.color, cells.attributes)
+      # cells is moving
+      cells.moving() 
 
-        cells.adapt_color()
+      # Determine if cells will be replicating it self
+      if isReplicating(cells):
+        daugther_cell = cells.replication()
+        cells_list.append(daugther_cell)  # Adding the daugther cell to the list
+      else:
+        pass
+    
+      
+    main_window.fill(cells.color, cells.attributes)
 
-        if cells.age >= 5000:
-            cells_list.remove(cells)
-    if i % 100 == 0:
-        logger.counting_cell()
-    pygame.display.flip()  # Displaying the window continuously
+    cells.adapt_color()
+
+    
+
+    
+  if i % 100 == 0:
+    logger.counting_cell()
+  pygame.display.flip()  # Displaying the window continuously
 
 logger.draw_cell_number_by_time()
 
