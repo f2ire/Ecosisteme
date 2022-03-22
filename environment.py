@@ -1,47 +1,27 @@
-###########
-# MODULES # 
-###########
+import environment_unit
 
 
+class Environment:
+    """
+    Class stocking multiple environment_unit
+    """
 
-
-
-####################
-# CLASS DEFINITION #
-####################
-class environmental_unit:
-  """
-  This class provides the smallest element of our environment -> a white 1x1 square
-  This element is just storing environmental parameters such as temperature, pression etc.
-  This element remembers if it is emppty or occupied
-  """
-  # Dimensions and color of the unit
-  (length, width) = (1,1) # 1x1 square
-  color = (255,255,255) # WHITE
-  
-  # Boolean attribute telling if the unit is occupied by another element of the ecosystem or not
-  is_occupied = False
-  
-  
-  # FONDAMENTAL METHODS
-  def __init__(self,posx,posy):
-    # Initialization of the position
-    self.x = posx
-    self.y = posy
-    
-    # Attributes is in this rectangle tuple format to fit to the pygame.fill() method which fills rectangle objects 
-    self.attributes = (self.x,self.y,self.length,self.width)
-    
-
-  # OTHER METHODS
-  def isOccupied(self):
-    pass
-
-
-
-
-
-
-#############
-# MAIN CODE #
-#############
+    def __init__(self, length, width):
+        self.length = length
+        self.width = width
+        self.number_columns = round(
+            self.width / environment_unit.EnvironmentalUnit.width
+        )
+        self.number_rows = round(
+            self.length / environment_unit.EnvironmentalUnit.length
+        )
+        self.grid = [
+            [
+                environment_unit.EnvironmentalUnit(
+                    x * environment_unit.EnvironmentalUnit.width,
+                    y * environment_unit.EnvironmentalUnit.length,
+                )
+                for x in range(self.number_columns)
+            ]
+            for y in range(self.number_rows)
+        ]

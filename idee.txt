@@ -5,3 +5,7 @@ biome : comparer la survie d'une espece selon les différents biome
 
 
 idée pour le pb de grille : animation sans grille mais calcul des données etc avec
+
+
+
+stocker les valeurs a chaque fois dans un txt ou json

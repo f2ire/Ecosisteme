@@ -17,11 +17,15 @@ class Direction:
         """
         Return a random Direction
         """
-        return random.choice([Direction.NORTH,
-                              Direction.NORTHEAST,
-                              Direction.EAST,
-                              Direction.SOUTHEAST,
-                              Direction.SOUTH,
-                              Direction.SOUTHWEST,
-                              Direction.WEST,
-                              Direction.NORTHWEST])
+        return random.choice(
+            [
+                Direction.NORTH,
+                Direction.NORTHEAST,
+                Direction.EAST,
+                Direction.SOUTHEAST,
+                Direction.SOUTH,
+                Direction.SOUTHWEST,
+                Direction.WEST,
+                Direction.NORTHWEST,
+            ]
+        )

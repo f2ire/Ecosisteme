@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 
 
 class DataLogger:
@@ -14,8 +14,9 @@ class DataLogger:
         self.cell_count.append(len(self.cell_list))
 
     def draw_cell_number_by_time(self):
-        plt.plot([i/10000 for i in range(len(self.cell_count))],
-                 self.cell_count)
+        plt.plot(
+            [i / 10000 for i in range(len(self.cell_count))], self.cell_count
+        )
         plt.title("Number of cell by time")
         plt.ylabel("Number of cell")
         plt.xlabel("Time (Arbitary units)")
