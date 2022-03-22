@@ -1,10 +1,3 @@
-# This is the main file of our 'Ecosysteme' project
-# Here is the list of commands needed to save the changes and update the file
-# to Github.com
-# git add .
-# git commit -m "Ecrire un message résumant les changemets"
-# git push
-
 ###########
 # MODULES #
 
@@ -25,7 +18,8 @@ import environment
 pygame.init()  # Initiation of pygame -> mandatory
 
 # CREATION OF THE WINDOW
-window_edge = 600  # in pixels -> wanted edge size for the display window
+
+window_edge = 600  # in pixel
 # Creation of the main window -> size : window_surface x window_surface
 main_window = pygame.display.set_mode((window_edge, window_edge))
 bg_color = (255, 255, 255)  # WHITE for the background color
@@ -44,47 +38,35 @@ main_window.fill(first_cell.color, first_cell.attributes)
 logger = data_logger.DataLogger(cells_list)
 
 # GAME LOOP
-i = 0
+step = 0
 while True:
     event = pygame.event.poll()  # Collecting an event from the user
-    # The loop (and the code) terminates if the user click on the close
-    # button of the window
-    if event.type == pygame.QUIT:
+    if event.type == pygame.QUIT:  # End loop if user click on cross butun
         break
 
     main_window.fill(bg_color)  # Resetting the window blank
 
-    # If the list is empty we stop the loop
-    if len(cells_list) == 0:
+    if len(cells_list) == 0:  # If the list is empty we stop the loop
         break
-    else:
 
+    else:
         for cells in cells_list:
-            # Determine if cells should die from age
-            if (
-                cells.isTooOld()
-            ):  # Yes -> removes the cell from the list and the loop goes
-                # directly on the next cell
+            if cells.isTooOld():
+                # Remove cell object and end loop
                 cells_list.remove(cells)
                 break
-            else:  # No -> cells is aging, moving and maybe replicating
-                # cells is aging
+            else:
                 cells.age += 1
-
-                # cells is moving
+                cells.adapt_color()
                 cells.moving()
 
-                # cells might replicates itself
                 if cells.isReplicating():
+                    # Add pointer to cell in the cells_list
                     cells_list.append(cells.replication())
-                else:
-                    pass
-                # cells is changing color as a function of it age
-                cells.adapt_color()
 
             main_window.fill(cells.color, cells.attributes)
 
-    if i % 100 == 0:
+    if step % 100 == 0:  # divide by 100 number of data
         logger.counting_cell()
 
     pygame.display.flip()  # Displaying the window continuously

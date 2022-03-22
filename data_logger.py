@@ -2,11 +2,34 @@ import matplotlib.pyplot as plt
 
 
 class DataLogger:
-    """
-    Class to log what happened during the simulation
+    """Class to use and log data
+
+    Object contening data to study
+
+    Attribute
+    -------
+    cell_list : list
+        List of data to study (actually a cells list)
+    cell_count : list
+        List of the number of cell by time
+
+    Methods
+    -------
+    counting_cell(self) -> None
+        Update cell_count and add it the length of the latest self.cell_list
+    draw_cell_number_by_time(self) -> None
+        Draw a representation of number of cell by time
     """
 
     def __init__(self, cell_list: list):
+        """
+        Object to log the data
+
+        Parameters
+        ----------
+        cell_list : list
+            List of cells to log and study
+        """
         self.cell_list = cell_list
         self.cell_count = []
 

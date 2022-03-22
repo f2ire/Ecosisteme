@@ -9,22 +9,53 @@ import math
 
 
 class EnvironmentalUnit:
-    """
-    This class provides the smallest element of our environment ->
-    a white 1x1 square
-    This element is just storing environmental parameters such as temperature
+    """This class provides the smallest element of our environment
+
+
+
+    Object of a square of length x width.
+    This element is just storing all the cells according to their coordonate\n
+    Furthermore, it store environmental parameters such as temperature,
     pression etc.
-    This element remembers if it is emppty or occupied
+
+    Attribute
+    -------
+    xlist : list
+        List of all int x in the object
+    ylist : list
+        List of all int y in the object
+    cell_list : list
+        List of all Cell object in the coordinates of the object
+    attributes : tuple
+        Tuple with all attribate to draw a square
+
+    Method
+    -------
+    is_cell_coord_are_inside(self, cell : Cell) -> return bool
+        Return True if cell's coordinates are in self.ylist and self.xlist
+    cell_insert(self, cell : Cell) -> None
+        Add new cell in self.cell_list if cell is not in cell_list, but
+        if his coordinate are in self.ylist and self.xlist
+    cell_del(self, cell : Cell) -> None
+        Del current cell from self.cell_list if his coordinate are not in
+        self.ylist and self.xlist
+    isOcuppied(self) -> bool
+        Return True if there are Cell in self.cell_list, else False
     """
 
-    # Dimensions and color of the unit
-    (length, width) = (10, 10)  # 1x1 square
-
-    # Boolean attribute telling if the unit is occupied by another element
-    # of the ecosystem or not
+    # Dimensions
+    length = 10
+    width = 10
 
     # FONDAMENTAL METHODS
-    def __init__(self, posx, posy):
+    def __init__(self, posx: int, posy: int):
+        """
+        Unit of a object Environment.
+
+        Args:
+            posx (int): positions on x axis
+            posy (int): positions on y axis
+        """
         # Initialization of the position
         self.xlist = list(range(posx, posx + self.length))
         self.ylist = list(range(posy, posy + self.width))

@@ -9,3 +9,11 @@ idée pour le pb de grille : animation sans grille mais calcul des données etc 
 
 
 stocker les valeurs a chaque fois dans un txt ou json
+
+
+
+____________________________
+
+Cell.py 
+
+Modifier le mvmnt speed --> correspondre à vraiment un mvmnt speed et rajouter une variable taille du pas

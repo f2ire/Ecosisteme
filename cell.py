@@ -9,29 +9,27 @@ from tools.direction import Direction
 
 class Cell:
     """
-    The cell object, the fondamental unit of life
+    Cell object is the fondamental unit of life
     Cells should be capable of moving towards energy&food sources
-    and replicate itself
+    and replicate itself. It has some basic attributs
     A cell is represented as a small square in the environment
+    localized by his coordonates
     """
 
-    # The dimensions of the cell for the display in the pygame window
+    # Visual caracteristic
     length: int = 10
     width: int = 10
     birth_color: tuple = (255, 102, 0)
     death_color: tuple = (0, 12, 255)
 
-    # The number of pixels the cell is capable of moving in one iteration of
-    # the game loop
+    # Cell parameter
     mvmt_speed: float = 3
 
     # The number of times the cell replicates itself in one iteration of the
     # game loop
     growth_rate: float = 1 / 3500
 
-    # The oldest age a cell can be. This number is chosen randomly between
-    # 6000 and 10000 to simulates diversity
-
+    # This number is chosen randomly between 6000 and 10000 for diversity
     max_age: int = random.randint(6000, 10000)
 
     env: environment.Environment = None
@@ -90,7 +88,6 @@ class Cell:
         """
         Returns True if the cell replicates itself based on its growth_rate
         """
-        # Boolean telling if the cell is gonna replicates itself
         is_replicating = random.random() <= self.growth_rate
         return is_replicating
 
@@ -99,7 +96,6 @@ class Cell:
         The cell makes a copy of itself in one direction accessible around it,
         this method returns the daughter cell.
         """
-        # The daughter cell is made in a random direction around mother cell
         random_direction = Direction.get_random_direction()
         new_x = self.x + 10 * random_direction[0]
         new_y = self.y + 10 * random_direction[1]
