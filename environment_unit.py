@@ -14,7 +14,7 @@ class EnvironmentalUnit:
 
 
     Object of a square of length x width.
-    This element is just storing all the cells according to their coordonate\n
+    This element is just storing all the cells according to their coordonate
     Furthermore, it store environmental parameters such as temperature,
     pression etc.
 
@@ -31,7 +31,7 @@ class EnvironmentalUnit:
 
     Method
     -------
-    is_cell_coord_are_inside(self, cell : Cell) -> return bool
+    is_cell_coord_are_inside(self, cell : Cell) -> bool
         Return True if cell's coordinates are in self.ylist and self.xlist
     cell_insert(self, cell : Cell) -> None
         Add new cell in self.cell_list if cell is not in cell_list, but

@@ -45,7 +45,7 @@ while True:
         break
 
     main_window.fill(bg_color)  # Resetting the window blank
-
+    main_window.fill(first_cell.color,(0,0,10,10))
     if len(cells_list) == 0:  # If the list is empty we stop the loop
         break
 
