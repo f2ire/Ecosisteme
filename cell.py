@@ -3,7 +3,7 @@
 ###########
 import math
 import random
-import environment
+import numpy as np
 from tools.direction import Direction
 
 ####################
@@ -19,13 +19,12 @@ class Cell:
     """
 
     # Visual caracteristic
-    length: int = 10
-    width: int = 10
+    width, length = (10,10)
     birth_color: tuple = (255, 102, 0)
     death_color: tuple = (0, 12, 255)
 
     # Cell parameter
-    mvmt_speed: float = 3
+    mvmt_speed: float = 2
 
     # The number of times the cell replicates itself in one iteration of the
     # game loop
@@ -34,25 +33,20 @@ class Cell:
     # This number is chosen randomly between 6000 and 10000 for diversity
     max_age: int = random.randint(6000, 10000)
 
-    # Square in the Environment grid used by the cell
-    occupied_x_coord: list = []
-    occupied_y_coord: list = []
+    # Square in the Environment grid used by the cell -> using np to fasten the computations
+    occupied_x_coord: np.array = np.empty(shape=(width,length))
+    occupied_y_coord: np.array = np.empty(shape=(width,length))
 
-    env: environment.Environment = None
 
-    
     def __init__(self, pos_x: int = 0, pos_y: int = 0):
         # The starting position of the cell
         self.x: int = pos_x
         self.y: int = pos_y
 
         # Initialization of the space used by the cell
-        self.UsedSpace()
+        self.occupied_x_coord = np.array([float(x) for x in range(self.x, self.x + self.width)])
+        self.occupied_y_coord = np.array([float(y) for y in range(self.y, self.y + self.length)])
         
-        
-        self.unit_pos = None
-
-        self.updatePosIntoEnvironment()
 
         # Attributes is in this rectangle tuple format to fit
         # to the pygame.fill() method which fills rectangle objects
@@ -65,53 +59,60 @@ class Cell:
 
 
     def __repr__(self) -> str:
-        return f"Cell at ({self.x}, {self.y}) is {'' if self in self.unit_pos.cell_list else 'not'} cell_list"
+        return f"Cell at ({self.x}, {self.y})"
     
     ###########
     # METHODS #
-    ########### 
-    def UsedSpace(self) -> None:
+    ###########
+    def InitiatePosition(self,enviro) -> None:
         """
-        A cell is using a certain surface of the terrain -> width x length square
-        The method keeps track of the surface used by the cell in the environment grid by updating the occupied coordonates in 2 lists :
-        occupied_x_coord and occupied_y_coord
+        Calls the CellUsingSpace of the environment module to occupied the all the unit crossed by the cell.
+        Has to be called in the main.py
+        Args :
+            enviro (Environment): an object of the instance Environment of environment.py 
         """
-        # Pygame creates a square from it top-right hand corner -> we start from posx and posy
-        self.occupied_x_coord = [x for x in range(self.x, self.x + self.width)]
-        self.occupied_y_coord = [y for y in range(self.y, self.y + self.length)]
+        enviro.CellUsingSpace(self.occupied_x_coord,self.occupied_y_coord)
         return None
 
 
-    def Moving(self) -> None:
+    def Moving(self, enviro) -> None:
         """
-        This method makes the cell move in a random direction, 
-        after checking if the environment in the direction isn't occupied by others cells
-        The new coordinates are 
+        This method makes the cell move in a random direction, after checking if the environment in the direction isn't occupied by others cells
+        The new coordinates are changed directly using UpdateSpace()
+        Args :
+            enviro (Environment): an object of the instance Environment of environment.py 
         """
         # Computes the potential coordonates of the cell
         random_direction = Direction.get_random_direction()
         movement_size: tuple = ((self.mvmt_speed * random_direction[0]),
                                 (self.mvmt_speed * random_direction[1]))
 
-        if self.env.IsSpaceForMoving(random_direction):
-            self.x += movement_size[0]  % Cell.env.width
-            self.y += movement_size[1]  % Cell.env.length
+        if enviro.IsSpaceForMoving(self,movement_size):
+            print((self.x + movement_size[0]) % enviro.width)
+            self.x = (self.x + movement_size[0]) % enviro.width
+            self.y = (self.y + movement_size[1]) % enviro.length
+            print(self.x, self.y)
             self.attributes = (self.x, self.y, self.length, self.width)
-            self.UpdatePosIntoEnvironment()
+            self.UpdateSpace(enviro,movement_size)
         else: pass # The cell don't move if the space is occupied
         return None
 
+    
+    def UpdateSpace(self, enviro ,movement: tuple) -> None:
+        """
+        A cell is using a certain surface of the terrain -> width x length square
+        The method updates the surface used by the cell in the environment grid by adding the movement to the occupied_x&y_coord arrays.
+        Args : 
+            enviro (Environment): an object of the instance Environment of environment.py 
+            movement (tuple): a tuple of 2 float number giving the direction and the number of pixels a cell has to move -> (x_mvt, y_mvt)
+        """
+        self.occupied_x_coord = (self.occupied_x_coord + movement[0]) % enviro.width
+        self.occupied_y_coord = (self.occupied_y_coord + movement[1]) % enviro.length
 
-    def UpdatePosIntoEnvironment(self) -> None:
-        if self.unit_pos is not None:
-            self.unit_pos.cell_del(self)
-        self.unit_pos = Cell.env.grid[math.floor(self.y / self.length)][
-            math.floor(self.x / self.width)
-        ]
-        self.unit_pos.cell_insert(self)
+        enviro.CellUsingSpace(self.occupied_x_coord,self.occupied_y_coord) # Makes the unit of the environment grid occupied
         return None
 
-    
+
     def Die(self):
         self.unit_pos.cell_list.remove(self)
         return None
@@ -162,17 +163,9 @@ class Cell:
 # MAIN CODE #
 #############
 if __name__ == "__main__":
-    cell_list = []
-    cell1 = Cell(
-        50,
-        50,
-    )
-    cell_list.append(cell1)
-    i = 0
-    while i < 16000:
-        if cell1.replication() is not None:
-            cell_list.append(cell1.replication())
-        else:
-            pass
-        i += 1
-    print(len(cell_list))
+    blob = Cell(30,78)
+    print("x coordonates : ",blob.occupied_x_coord, "\n y coordonates : ", blob.occupied_y_coord)
+    movement = (5,5)
+    blob.UpdateSpace(movement)
+    print("x coordonates : ",blob.occupied_x_coord, "\n y coordonates : ", blob.occupied_y_coord)
+
