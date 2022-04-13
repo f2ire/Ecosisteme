@@ -48,8 +48,8 @@ class Environment:
             occupied_x_coord (list): all the x coordinates occupied by the square of a cell
             occupied_y_coord (list): all the y coordinates occupied by the square of a cell
         """            
-        for x in range(occupied_x_coord[0], occupied_x_coord[-1], EnvironmentalUnit.width):
-            for y in range(occupied_y_coord[0], occupied_y_coord[-1], EnvironmentalUnit.length):
+        for x in range(int(occupied_x_coord[0]), int(occupied_x_coord[-1]), EnvironmentalUnit.width):
+            for y in range(int(occupied_y_coord[0]), int(occupied_y_coord[-1]), EnvironmentalUnit.length):
                 (self.grid[x][y]).is_occupied = True
         return None
 
@@ -67,9 +67,13 @@ class Environment:
         x_mvt, y_mvt = movement[0], movement[1] # to make the code more human readable
         for x_coo in range(math.floor((cell.x + x_mvt) % self.width), math.ceil((cell.x + cell.width + x_mvt) % self.width), EnvironmentalUnit.width):
             for y_coo in range(math.floor((cell.y + y_mvt) % self.length), math.ceil((cell.y + cell.length + y_mvt) % self.length), EnvironmentalUnit.length):
-                if self.grid[x_coo][y_coo].is_occupied:
-                    return False                
-                else:pass
+                # If x_coo and y_coo aren't in the previous space of the cell, it looks if there is space in the environmental_unit of coor (x_coo,y_coo)
+                if not (x_coo in cell.occupied_x_coord and y_coo in cell.occupied_y_coord): 
+                    if self.grid[x_coo][y_coo].is_occupied:
+                        print(False," because: ",x_coo,y_coo)
+                        return False                
+                    else:pass
+        print(True)
         return True
 
 
@@ -79,9 +83,9 @@ class Environment:
 if __name__ == "__main__":
     env = Environment(100,100)
     blobby = Cell(2,7)
-    blobou = Cell(5,3)
+    #blobou = Cell(5,3)
     blobby.InitiatePosition(enviro=env)
-    blobou.InitiatePosition(enviro=env)
+    #blobou.InitiatePosition(enviro=env)
     for i in range(50):
         print(blobby)
         blobby.Moving(enviro=env)

@@ -88,10 +88,8 @@ class Cell:
                                 (self.mvmt_speed * random_direction[1]))
 
         if enviro.IsSpaceForMoving(self,movement_size):
-            print((self.x + movement_size[0]) % enviro.width)
             self.x = (self.x + movement_size[0]) % enviro.width
             self.y = (self.y + movement_size[1]) % enviro.length
-            print(self.x, self.y)
             self.attributes = (self.x, self.y, self.length, self.width)
             self.UpdateSpace(enviro,movement_size)
         else: pass # The cell don't move if the space is occupied
