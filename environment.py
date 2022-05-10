@@ -49,11 +49,22 @@ class Environment:
     Method only used to initiates the cell on the environment grid -
     > sets all the environment units sharing the same coordinates as the cell to occupied
     """
-    for x in range(math.floor(cell.occupied_x_coord[0] / EnvironmentalUnit.width), math.floor(cell.occupied_x_coord[-1] / EnvironmentalUnit.width), EnvironmentalUnit.width):
-      for y in range(math.floor(cell.occupied_y_coord[0] / EnvironmentalUnit.length), math.floor(cell.occupied_y_coord[-1] / EnvironmentalUnit.length), EnvironmentalUnit.length):
+    for x in range(math.ceil(cell.occupied_x_coord[0] / EnvironmentalUnit.width), math.floor(cell.occupied_x_coord[-1] / EnvironmentalUnit.width), EnvironmentalUnit.width):
+      for y in range(math.ceil(cell.occupied_y_coord[0] / EnvironmentalUnit.length), math.floor(cell.occupied_y_coord[-1] / EnvironmentalUnit.length), EnvironmentalUnit.length):
         (self.grid[x][y]).is_occupied = True
     
     return None
+
+
+  def SuppressCell(self, cell: Cell):
+    """
+    Sets all the environmental units of a cell to "not occupied"
+    Args:
+        cell (Cell): cell object
+    """
+    for x in range(math.ceil(cell.occupied_x_coord[0] / EnvironmentalUnit.width), math.floor(cell.occupied_x_coord[-1] / EnvironmentalUnit.width), EnvironmentalUnit.width):
+      for y in range(math.ceil(cell.occupied_y_coord[0] / EnvironmentalUnit.length), math.floor(cell.occupied_y_coord[-1] / EnvironmentalUnit.length), EnvironmentalUnit.length):
+        (self.grid[x][y]).is_occupied = False
 
 
   def CellUsingSpace(self, cell: Cell, movement: tuple) -> None:
@@ -68,14 +79,11 @@ class Environment:
     """
     x_mvt, y_mvt = movement[0], movement[1]
 
-    # First loop setting all the units occupied by the cell before the movement to inoccupied 
-    for x in range(math.floor(cell.occupied_x_coord[0] / EnvironmentalUnit.width), math.floor(cell.occupied_x_coord[-1] / EnvironmentalUnit.width), EnvironmentalUnit.width):
-      for y in range(math.floor(cell.occupied_y_coord[0] / EnvironmentalUnit.length), math.floor(cell.occupied_y_coord[-1] / EnvironmentalUnit.length), EnvironmentalUnit.length):
-        (self.grid[x][y]).is_occupied = False
-    
+    self.SuppressCell(cell)
+   
     # Make the code more readable
-    x_start = math.floor((cell.x + 2*x_mvt ) / EnvironmentalUnit.width) % self.width
-    y_start = math.floor((cell.x + cell.width + 2*x_mvt ) / EnvironmentalUnit.width) % self.length
+    x_start = math.ceil((cell.x + 2*x_mvt ) / EnvironmentalUnit.width) % self.width
+    y_start = math.ceil((cell.x + cell.width + 2*x_mvt ) / EnvironmentalUnit.width) % self.length
     x_end = math.floor((cell.y + 2*y_mvt) / EnvironmentalUnit.length) % self.width
     y_end = math.floor((cell.y + cell.length + 2*y_mvt ) / EnvironmentalUnit.length) % self.length
 
@@ -119,8 +127,8 @@ class Environment:
     x_mvt, y_mvt = movement[0], movement[1]
 
     # to make the code more human readable
-    x_start = math.floor((cell.x + 2*x_mvt ) / EnvironmentalUnit.width) % self.width
-    y_start = math.floor((cell.y + 2*y_mvt) / EnvironmentalUnit.length) % self.length
+    x_start = math.ceil((cell.x + 2*x_mvt ) / EnvironmentalUnit.width) % self.width
+    y_start = math.ceil((cell.y + 2*y_mvt) / EnvironmentalUnit.length) % self.length
     x_end = math.floor((cell.x + cell.width + 2*x_mvt ) / EnvironmentalUnit.width) % self.width  
     y_end = math.floor((cell.y + cell.length + 2*y_mvt ) / EnvironmentalUnit.length) % self.length
 
@@ -132,6 +140,27 @@ class Environment:
           if self.grid[x_coo][y_coo].is_occupied:
             return False       
           else:pass
+    return True
+
+  
+  def IsSpaceForReplication(self, direction: tuple, cell: Cell):
+    """
+    This method checks if their is space available for the replication of a cell.
+    Their must be a space of width x length available in the specified direction so the replication can be performed
+    Args :
+      cell (Cell): cell object
+      direction (tuple): contains 2 coordinates telling in which direction the replication is supposed to happen.
+    """
+    x_dir, y_dir = direction[0], direction[1]
+    x_start = math.ceil(cell.x + cell.width * x_dir)
+    y_start = math.ceil(cell.y + cell.length * y_dir)
+    x_end = math.floor(cell.x + 2 * cell.width * x_dir)
+    y_end = math.floor(cell.y + 2 * cell.length * y_dir)
+
+    for x in range(x_start, x_end, EnvironmentalUnit.width):
+      for y in range(y_start, y_end, EnvironmentalUnit.length):
+        if self.grid[x][y].is_occupied:
+          return False
     return True
 
 

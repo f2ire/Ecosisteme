@@ -97,27 +97,30 @@ class Cell:
     return None
 
 
-  def IsReplicating(self) -> bool:
+  def Replicating(self, enviro, cells_list: list) -> None:
     """
-    Returns True if the cell replicates itself based on its growth_rate
+    Returns True if the cell replicates itself based on its growth_rate and the space available around it
+    Args :
+      enviro (Environment): an object of the instance Environment of environment.py
+      cells_list (list): the list of all the cells of our environment
     """
-    is_replicating = random.random() <= self.growth_rate
-    return is_replicating
+    is_replicating = random.random() <= self.growth_rate # boolean checking if the cell will replicate itself based on it division probability 
+    if is_replicating:
+      random_direction = Direction.GetRandomReplicationDirection()
+      if enviro.IsSpaceForReplication(random_direction, self):
+        cells_list.append(self.Replication(random_direction))
+      else : pass
+    else : pass
 
 
-  def Replication(self, enviro):
+  def Replication(self, direction: tuple):
     """
     The cell makes a copy of itself in one direction accessible around it,
     this method returns the daughter cell.
     Args :
-      enviro (Environment): an object of the instance Environment of environment.py
+      direction (tuple): contains the x and y direction where the cell will create a new cell by division
     """
-    random_direction = Direction.get_random_direction()
-    new_x = self.x + self.width * random_direction[0]
-    new_y = self.y + self.length * random_direction[1]
-    daughter_cell = Cell(new_x, new_y)
-    daughter_cell.Moving(enviro)
-    enviro.InitCellOnGrid(daughter_cell)
+    daughter_cell = Cell(self.x + self.width * direction[0], self.y + self.length * direction[1])
     return daughter_cell
 
 

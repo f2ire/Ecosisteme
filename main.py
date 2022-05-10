@@ -53,15 +53,14 @@ while True:
     for c in cells_list:
       if c.IsTooOld():
         # Remove cell object and end loop
+        Env.SuppressCell(c)
         cells_list.remove(c)
         break
       else:
         c.age += 1
         c.AdaptColor()
         c.Moving(Env)
-        if c.IsReplicating():
-          # Add pointer to c in the cells_list
-          cells_list.append(c.Replication(Env))
+        c.Replicating(Env,cells_list)
     
         main_window.fill(c.color, c.attributes)
 
