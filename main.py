@@ -32,7 +32,7 @@ Env = Environment(window_edge, window_edge) # same dimensions as the window
 # Creating a cell in the middle of our window and initiating it
 first_cell = Cell(window_edge // 2, window_edge // 2) ; print(first_cell.occupied_x_coord)
 cells_list = [first_cell]
-Env.InitCellOnGrid(first_cell)
+Env.UsedSpace(first_cell.occupied_x_coord, first_cell.occupied_y_coord)
 main_window.fill(first_cell.color, first_cell.attributes)
 
 # For displaying the number of cells over time
@@ -53,7 +53,7 @@ while True:
     for c in cells_list:
       if c.IsTooOld():
         # Remove cell object and end loop
-        Env.SuppressCell(c)
+        Env.UsedSpace(c.occupied_y_coord, c.occupied_y_coord, delete=True)
         cells_list.remove(c)
         break
       else:

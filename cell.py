@@ -26,8 +26,8 @@ class Cell:
   mvmt_speed: float = 1
   # The number of times the cell replicates itself in one iteration of the game loop
   growth_rate: float = 1 / 3500
-  # This number is chosen randomly between 6000 and 10000 for diversity
-  max_age: int = 6000 #random.randint(4000, 6000)
+  
+  max_age: int = 6000 
   # Square in the Environment grid used by the cell -> using np to fasten the computations
   occupied_x_coord: np.array = np.empty(shape=(width,length))
   occupied_y_coord: np.array = np.empty(shape=(width,length))
@@ -38,7 +38,7 @@ class Cell:
     self.x: int = pos_x
     self.y: int = pos_y
     
-    # Initialization of the space used by the cell
+    # Initialization of the space used by the cell in the environment grid 
     self.occupied_x_coord = np.array([x for x in range(math.floor(self.x), math.ceil(self.x + self.width), EnvironmentalUnit.width)])
     self.occupied_y_coord = np.array([y for y in range(math.floor(self.y), math.ceil(self.y + self.length), EnvironmentalUnit.length)])
     
@@ -61,35 +61,23 @@ class Cell:
     This method makes the cell move in a random direction, after checking if the environment in the direction isn't occupied by others cells
     The new coordinates are changed directly using UpdateSpace()
     Args :
-        enviro (Environment): an object of the instance Environment of environment.py 
+      enviro (Environment): an object of the instance Environment of environment.py 
     """
     # Computes the potential coordonates of the cell
     random_direction = Direction.get_random_direction()
     movement_size: tuple = ((self.mvmt_speed * random_direction[0]), (self.mvmt_speed * random_direction[1]))
-    
-    if enviro.IsSpaceForMoving(self,movement_size): # checking in the direction of the movement if the cell has space to move
+    # Length of the movement is doubled to prevent cells from superposing if they both go in the same direction
+    predict_mvt = (2*movement_size[0], 2*movement_size[1])
+    print(enviro.IsSpace(self.occupied_x_coord, self.occupied_y_coord, predict_mvt))
+    if enviro.IsSpace(self.occupied_x_coord, self.occupied_y_coord, predict_mvt): # checking in the direction of the movement if the cell has space to move
+      enviro.SpaceMvt(self.occupied_x_coord, self.occupied_y_coord, movement_size) # updating occupied space by the cell on the grid
       self.x = (self.x + movement_size[0]) % enviro.width
       self.y = (self.y + movement_size[1]) % enviro.length
+      # Updating the lists storing the coordinates of the cell on the environment gridd
+      self.occupied_x_coord = (self.occupied_x_coord + math.ceil(movement_size[0])) % enviro.width
+      self.occupied_y_coord = (self.occupied_y_coord + math.ceil(movement_size[1])) % enviro.length
       self.attributes = (self.x, self.y, self.length, self.width)
-      self.UpdateSpace(enviro,movement_size)
     else: pass # The cell don't move if the space is occupied
-    return None
-
-  
-  def UpdateSpace(self, enviro ,movement: tuple) -> None:
-    """
-    A cell is using a certain surface of the terrain -> width x length square
-    The method updates the surface used by the cell in the environment grid by adding the movement to the occupied_x&y_coord arrays.
-    Args : 
-      enviro (Environment): an object of the instance Environment of environment.py 
-      movement (tuple): a tuple of 2 float number giving the direction and the number of pixels a cell has to move -> (x_mvt, y_mvt)
-    """
-    # Updates the environmental units status, setting environmental units to occupied or inoccupied depending of the movement
-    enviro.CellUsingSpace(self, movement)  
-    
-    self.occupied_x_coord = (self.occupied_x_coord + math.ceil(movement[0])) % enviro.width
-    self.occupied_y_coord = (self.occupied_y_coord + math.ceil(movement[1])) % enviro.length
-    
     return None
 
 
@@ -103,10 +91,14 @@ class Cell:
     is_replicating = random.random() <= self.growth_rate # boolean checking if the cell will replicate itself based on it division probability 
     if is_replicating:
       random_direction = Direction.GetRandomReplicationDirection()
-      if enviro.IsSpaceForReplication(random_direction, self):
-        cells_list.append(Cell(self.x + self.width * random_direction[0], self.y + self.length * random_direction[1]))
+      replication_range = (self.width*random_direction[0], self.length*random_direction[1])
+      if enviro.IsSpace(self.occupied_x_coord, self.occupied_y_coord, replication_range):
+        daughter_cell = Cell(self.x + self.width * random_direction[0], self.y + self.length * random_direction[1])
+        enviro.UsedSpace(daughter_cell.occupied_x_coord, daughter_cell.occupied_y_coord) # initialise the space occupied by the daughter cell on the environment grid
+        cells_list.append(daughter_cell)
       else : pass
     else : pass
+    return None
 
 
   def IsTooOld(self) -> bool:
