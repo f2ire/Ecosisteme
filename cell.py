@@ -5,6 +5,7 @@ import math
 import random
 import numpy as np
 from tools.direction import Direction
+from environment_unit import EnvironmentalUnit
 
 ####################
 # CLASS DEFINITION #
@@ -26,7 +27,7 @@ class Cell:
   # The number of times the cell replicates itself in one iteration of the game loop
   growth_rate: float = 1 / 3500
   # This number is chosen randomly between 6000 and 10000 for diversity
-  max_age: int = random.randint(4000, 6000)
+  max_age: int = 6000 #random.randint(4000, 6000)
   # Square in the Environment grid used by the cell -> using np to fasten the computations
   occupied_x_coord: np.array = np.empty(shape=(width,length))
   occupied_y_coord: np.array = np.empty(shape=(width,length))
@@ -38,8 +39,8 @@ class Cell:
     self.y: int = pos_y
     
     # Initialization of the space used by the cell
-    self.occupied_x_coord = np.array([x for x in range(math.floor(self.x), math.ceil(self.x + self.width))])
-    self.occupied_y_coord = np.array([y for y in range(math.floor(self.y), math.ceil(self.y + self.length))])
+    self.occupied_x_coord = np.array([x for x in range(math.floor(self.x), math.ceil(self.x + self.width), EnvironmentalUnit.width)])
+    self.occupied_y_coord = np.array([y for y in range(math.floor(self.y), math.ceil(self.y + self.length), EnvironmentalUnit.length)])
     
     # Attributes is in this rectangle tuple format to fit to the pygame.fill() method which fills rectangle objects
     self.attributes = (self.x, self.y, self.width, self.length)
@@ -92,14 +93,9 @@ class Cell:
     return None
 
 
-  def Die(self):
-    self.unit_pos.cell_list.remove(self)
-    return None
-
-
   def Replicating(self, enviro, cells_list: list) -> None:
     """
-    Returns True if the cell replicates itself based on its growth_rate and the space available around it
+    Add a new cell to cells_list if their is enough space to create it. 
     Args :
       enviro (Environment): an object of the instance Environment of environment.py
       cells_list (list): the list of all the cells of our environment
@@ -108,20 +104,9 @@ class Cell:
     if is_replicating:
       random_direction = Direction.GetRandomReplicationDirection()
       if enviro.IsSpaceForReplication(random_direction, self):
-        cells_list.append(self.Replication(random_direction))
+        cells_list.append(Cell(self.x + self.width * random_direction[0], self.y + self.length * random_direction[1]))
       else : pass
     else : pass
-
-
-  def Replication(self, direction: tuple):
-    """
-    The cell makes a copy of itself in one direction accessible around it,
-    this method returns the daughter cell.
-    Args :
-      direction (tuple): contains the x and y direction where the cell will create a new cell by division
-    """
-    daughter_cell = Cell(self.x + self.width * direction[0], self.y + self.length * direction[1])
-    return daughter_cell
 
 
   def IsTooOld(self) -> bool:

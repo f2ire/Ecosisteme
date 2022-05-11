@@ -2,6 +2,7 @@
 # MODULES #
 ###########
 import math
+import numpy as np
 from cell import Cell
 from environment_unit import EnvironmentalUnit
 
@@ -44,76 +45,22 @@ class Environment:
   ###########
   # METHODS #
   ########### 
-  def InitCellOnGrid(self, cell: Cell) -> None:
+  def UsedSpace(self, x_list: np.array, y_list: np.array, delete: bool = False) -> None:
+    """ Sets all the coordinates of the environment grid occupied by the cell on 'occupied' or 'not occupied' depending on the value of delete.
+    Args:
+      delete (bool): if set to True then the is_occupied parameter is set to False
+      x_list (np.array): array containing every coordinates on the environment grid of an entity along the x axis 
+      y_list (np.array): array containing every coordinates on the environment grid of an entity along the y axis 
     """
-    Method only used to initiates the cell on the environment grid -
-    > sets all the environment units sharing the same coordinates as the cell to occupied
-    """
-    for x in range(math.ceil(cell.occupied_x_coord[0] / EnvironmentalUnit.width), math.floor(cell.occupied_x_coord[-1] / EnvironmentalUnit.width), EnvironmentalUnit.width):
-      for y in range(math.ceil(cell.occupied_y_coord[0] / EnvironmentalUnit.length), math.floor(cell.occupied_y_coord[-1] / EnvironmentalUnit.length), EnvironmentalUnit.length):
-        (self.grid[x][y]).is_occupied = True
+    for x in x_list:
+      for y in y_list:
+        if(not delete):
+          self.grid[x][y].is_occupied = True
+        else :
+          self.grid[x][y].is_occupied = False
     
     return None
-
-
-  def SuppressCell(self, cell: Cell):
-    """
-    Sets all the environmental units of a cell to "not occupied"
-    Args:
-        cell (Cell): cell object
-    """
-    for x in range(math.ceil(cell.occupied_x_coord[0] / EnvironmentalUnit.width), math.floor(cell.occupied_x_coord[-1] / EnvironmentalUnit.width), EnvironmentalUnit.width):
-      for y in range(math.ceil(cell.occupied_y_coord[0] / EnvironmentalUnit.length), math.floor(cell.occupied_y_coord[-1] / EnvironmentalUnit.length), EnvironmentalUnit.length):
-        (self.grid[x][y]).is_occupied = False
-
-
-  def CellUsingSpace(self, cell: Cell, movement: tuple) -> None:
-    """
-    This method sets the newly used environmental units on 'occupied' and the no longer used environmental units are set up on 'not occupied'
-    according to the movement of the cell
-    go through all the coordinates stored in cell.occupied_x_coordinates (same for y) with an increment depending of the size of 
-    an environment_unit and sets all environment_units to 'occupied'. 
-    Args:
-        cell (Cell): cell object
-        movement (tuple): a tuple of 2 float number giving the direction and the number of pixels a cell has to move -> (2*x_mvt, 2*y_mvt)
-    """
-    x_mvt, y_mvt = movement[0], movement[1]
-
-    self.SuppressCell(cell)
-   
-    # Make the code more readable
-    x_start = math.ceil((cell.x + 2*x_mvt ) / EnvironmentalUnit.width) % self.width
-    y_start = math.ceil((cell.x + cell.width + 2*x_mvt ) / EnvironmentalUnit.width) % self.length
-    x_end = math.floor((cell.y + 2*y_mvt) / EnvironmentalUnit.length) % self.width
-    y_end = math.floor((cell.y + cell.length + 2*y_mvt ) / EnvironmentalUnit.length) % self.length
-
-    # Second loop setting all the new coordinates of the cell to occupied
-    for x in range(x_start, x_end, EnvironmentalUnit.width):
-      for y in range(y_start,y_end, EnvironmentalUnit.length):
-        (self.grid[x][y]).is_occupied = True
-
-    return None
-    """" Ideas for complexity optimisation
-    # starting_xT is the starting x coordinates from which to set is_occupied to True. Same for starting_yT.
-    starting_xT, starting_yT = min(cell.x + cell.width, cell.x + cell.width + x_mov), min(cell.y, cell.y + y_mov)
-    # ending_xT is the ending x coordinates to which set is_occupied to True.
-    ending_xT, ending_yT = max(cell.x + cell.width, cell.x + cell.width + x_mov), max(cell.y, cell.y + y_mov)
     
-    # Same here
-    starting_xF, starting_yF = min(cell.x, cell.x + x_mov), min(cell.y + cell.length, cell.y + cell.length + y_mov)      
-    ending_xF, ending_yF = max(cell.x, cell.x + x_mov), max(cell.y + cell.length, cell.y + cell.length + y_mov)
-    # Boolean telling if we have to set the unit to True or False depending of the direction of the movement
-    dir_bool = 
-    # Loop setting the units back to inoccupied
-    for x in range(starting_xF, ending_xF, EnvironmentalUnit.width):
-        for y in range(starting_yF, ending_yF, EnvironmentalUnit.length):
-            (self.grid[x][y]).is_occupied = 
-    # Loop setting the newly occupied units's is_occupied to True
-    for x in range(starting_xT, ending_xT, EnvironmentalUnit.width):
-        for y in range(starting_yT, ending_yT, EnvironmentalUnit.length):
-            (self.grid[x][y]).is_occupied = True
-    """
-
 
   def IsSpaceForMoving(self, cell: Cell, movement : tuple) -> bool:
     """
@@ -140,6 +87,7 @@ class Environment:
           if self.grid[x_coo][y_coo].is_occupied:
             return False       
           else:pass
+
     return True
 
   
