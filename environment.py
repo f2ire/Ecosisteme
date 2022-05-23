@@ -1,12 +1,11 @@
 ###########
 # MODULES #
 ###########
-from itertools import starmap
 import math
-from matplotlib.axis import XAxis
 import numpy as np
 from cell import Cell
 from environment_unit import EnvironmentalUnit
+import time as t
 
 ####################
 # CLASS DEFINITION #
@@ -23,7 +22,7 @@ class Environment:
       width (int): width of the environment (width of window in pixel)
     """
     self.length: int = length
-    self.width: int = width
+    self.width: int  = width
     self.number_columns: int = round(self.width / EnvironmentalUnit.width)
     self.number_rows: int = round(self.length / EnvironmentalUnit.length)
     
@@ -39,14 +38,17 @@ class Environment:
     index = 0
     string = f"Evironment dimension ({self.width},{self.length}) \n"
     # Representing the environment grid with 1 when the 'pixel' is occupied and 0 when it is not.
-    string += f" {[x for x in range(self.number_columns)]} \n"
+    string += "["
+    for n in range(self.number_columns):
+      string += f"{n},"
+    string += " ]\n"
     for row in self.grid:
       string += "["
       for unit in row:
         if unit.is_occupied:
-          string += "1 "
+          string += "X "
         else :
-          string += "0 "
+          string += ". "
       string += f"]{str(index)}\n"
       index += 1
     
@@ -54,31 +56,28 @@ class Environment:
       
   ###########
   # METHODS #
-  ########### 
-  def UsedSpace(self, x_list: np.array, y_list: np.array, delete: bool = False) -> None:
+  ###########
+  def UsedSpace(self, entity ,xlist: np.array, ylist: np.array, delete: bool = False) -> None:
     """ Sets all the coordinates of the environment grid occupied by the cell on 'occupied' or 'not occupied' depending on the value of delete.
     
     Args:
+      entity :  object of any classes (Cell ...)
       delete (bool): if set to True then the is_occupied parameter is set to False
-      x_list (np.array): array containing every coordinates on the environment grid of an entity along the x axis 
-      y_list (np.array): array containing every coordinates on the environment grid of an entity along the y axis 
+      xlist (np.array): array containing every coordinates on the environment grid of an entity along the x axis 
+      ylist (np.array): array containing every coordinates on the environment grid of an entity along the y axis 
     """
-    for x in x_list:
-      for y in y_list:
-        if(not delete):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = True
-        else :
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = False
-    
+    for x in xlist:
+      for y in ylist:
+        self.grid[math.floor(x) % self.number_columns][math.floor(y) % self.number_rows].is_occupied = not delete
     return None
-  
 
-  def IsSpace(self, x_list: np.array, y_list: np.array, direction: tuple) -> bool:
+
+  def IsSpace(self, xlist: np.array, ylist: np.array, direction: tuple) -> bool:
     """ Checks if the environment units in a certain direction are available for the entity to move or replicate
 
     Args:
-      x_list (np.array): array containing every coordinates on the environment grid of an entity along the x axis 
-      y_list (np.array): array containing every coordinates on the environment grid of an entity along the y axis 
+      xlist (np.array): array containing every coordinates on the environment grid of an entity along the x axis 
+      ylist (np.array): array containing every coordinates on the environment grid of an entity along the y axis 
       direction (tuple): tuple of the maximum (absolute value) coordinates where the action will took place. For a cell entity, 
                          it should either be the values of the movement or the place where the daughter cell gonna appear
 
@@ -86,24 +85,26 @@ class Environment:
       bool: True if the space is available for the action, False if not
     """
     # Maximisation of the movement because it has to be an integer in order to be casted in the environment grid
+    # Multiplication by 2 or else the checking happens only on the surface of the actual entity
     if direction[0] > 0:
-      xm = math.ceil(direction[0])
+      xm = 2*math.ceil(direction[0])
     else:
-      xm = math.floor(direction[0])
+      xm = math.floor(2*direction[0])
     if direction[1] > 0:
-      ym = math.ceil(direction[1])
+      ym = 2*math.ceil(direction[1])
     else:
-      ym = math.floor(direction[1])
+      ym = math.floor(2*direction[1])
 
-    xstart, ystart, xend, yend = x_list[0], y_list[0], x_list[-1], y_list[-1]
+    xstart, ystart, xend, yend = math.floor(xlist[0]), math.floor(ylist[0]), math.floor(xlist[-1]), math.floor(ylist[-1])
+    print(xstart,xend,xm,";",ystart,yend,ym)
     # Increments for the for loops because we need only to go from an unit to another
-    x_i, y_i = EnvironmentalUnit.width, EnvironmentalUnit.length 
+    #x_i, y_i = EnvironmentalUnit.width, EnvironmentalUnit.length useless for the moment
   
-    # 8 cases in total 
+    # 8 cases in total
     # Case 1
     if xm > 0 and ym == 0:
-      for x in range(xend, xend+xm, x_i):
-        for y in y_list:
+      for x in range(xend, xend+xm):
+        for y in ylist:
           if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
@@ -112,8 +113,8 @@ class Environment:
     
     # Case 2
     elif xm < 0 and ym == 0:
-      for x in range(xstart+xm, xstart, x_i):
-        for y in y_list:
+      for x in range(xstart+xm, xstart):
+        for y in ylist:
           if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
@@ -122,8 +123,8 @@ class Environment:
 
     # Case 3
     elif xm == 0 and ym > 0:
-      for x in x_list:
-        for y in range(yend, yend+ym, y_i):
+      for x in xlist:
+        for y in range(yend, yend+ym):
           if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
@@ -132,8 +133,8 @@ class Environment:
 
     # Case 4
     elif xm == 0 and ym < 0:
-      for x in x_list:
-        for y in range(ystart+ym, ystart, y_i):
+      for x in xlist:
+        for y in range(ystart+ym, ystart):
           if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
@@ -142,13 +143,13 @@ class Environment:
 
     # Case 5
     elif xm > 0 and ym > 0:
-      for x in range(xend, xend+xm, x_i):
-        for y in range(ystart+ym, yend+ ym, y_i):
+      for x in range(xend, xend+xm):
+        for y in range(ystart+ym, yend+ ym):
           if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
-      for x in range(xstart+xm, xend, x_i):
-        for y in range(yend, yend+ym, y_i):
+      for x in range(xstart+xm, xend):
+        for y in range(yend, yend+ym):
           if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
@@ -157,13 +158,13 @@ class Environment:
 
     # Case 6
     elif xm > 0 and ym < 0:
-      for x in range(xend, xend+xm, x_i):
-        for y in range(ystart+ym, yend+ ym, y_i):
+      for x in range(xend, xend+xm):
+        for y in range(ystart+ym, yend+ ym):
           if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
-      for x in range(xstart+xm, xend, x_i):
-        for y in range(ystart+ym, ystart, y_i):
+      for x in range(xstart+xm, xend):
+        for y in range(ystart+ym, ystart):
           if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
@@ -172,13 +173,13 @@ class Environment:
 
     # Case 7
     elif xm < 0 and ym > 0:
-      for x in range(xstart+xm, xstart, x_i):
-        for y in range(ystart+ym, yend+ym, y_i):
+      for x in range(xstart+xm, xstart):
+        for y in range(ystart+ym, yend+ym):
           if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
-      for x in range(xstart, xend+xm, x_i):
-        for y in range(yend, yend+ym, y_i):
+      for x in range(xstart, xend+xm):
+        for y in range(yend, yend+ym):
           if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
@@ -187,39 +188,34 @@ class Environment:
 
       # Case 8
     else:
-      for x in range(xstart+xm, xstart, x_i):
-        for y in range(ystart+ym, yend+ym, y_i):
+      for x in range(xstart+xm, xstart):
+        for y in range(ystart+ym, yend+ym):
+          print(x,y)
           if self.grid[x % self.number_columns][y % self.number_rows]: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
-      for x in range(xstart, xend+xm, x_i):
-        for y in range(ystart+ym, ystart, y_i):
-          if self.grid[x % self.number_columns][y % self.number_rows] % self.number_columns.is_occupied: # if one 'pixel' is occupied then it returns False
+      for x in range(xstart, xend+xm):
+        for y in range(ystart+ym, ystart):
+          print(x,y)
+          if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
       # If after the checking of all the space where the action will take place, no unit is occupied it returns True
       return True
 
 
-  def SpaceMvt(self, x_list: np.array, y_list: np.array, movement: tuple) -> None:
+  def SpaceMvt(self, xlist: np.array, ylist: np.array, movement: tuple) -> None:
     """ Removes an entity from it's actual location in the environment grid and adds it next location in the environment grid.
 
     Args:
-      x_list (np.array): array containing every coordinates on the environment grid of an entity along the x axis 
-      y_list (np.array): array containing every coordinates on the environment grid of an entity along the y axis 
+      xlist (np.array): array containing every coordinates on the environment grid of an entity along the x axis 
+      ylist (np.array): array containing every coordinates on the environment grid of an entity along the y axis 
       movement (tuple): tuple of movement 'length' along x and y axes such as (xm,ym)
     """
-    # Maximisation of the movement because it has to be an integer in order to be casted in the environment grid
-    if movement[0] > 0:
-      xm = math.ceil(movement[0])
-    else:
-      xm = math.floor(movement[0])
-    if movement[1] > 0:
-      ym = math.ceil(movement[1])
-    else:
-      ym = math.floor(movement[1])
+    xm, ym = movement[0], movement[1]
 
-    xstart, ystart, xend, yend = x_list[0], y_list[0], x_list[-1], y_list[-1]
+    # +- 1 to extend the range of the search and minimize the leftovers (?)
+    xstart, ystart, xend, yend = xlist[0]-1, ylist[0]-1, xlist[-1]+1, ylist[-1]+1
     # Increments for the for loops because we need only to go from an unit to another
     x_i, y_i = EnvironmentalUnit.width, EnvironmentalUnit.length 
 
@@ -228,43 +224,43 @@ class Environment:
     if xm > 0 and ym == 0:
       # Loop to 'remove' the entity of the environment grid after the movement
       for x in range(xstart, xstart+xm, x_i):
-        for y in y_list:
+        for y in ylist:
           self.grid[x % self.number_columns][y % self.number_rows].is_occupied = False
       # Loop to 'add' the entity of the environment grid after the movement
       for x in range(xend, xend+xm, x_i):
-        for y in y_list:
+        for y in ylist:
           self.grid[x % self.number_columns][y % self.number_rows].is_occupied = True
     
     # Case 2 
     elif xm < 0 and ym == 0:
       # Loop to 'remove' the entity of the environment grid after the movement
       for x in range(xend+xm, xend, x_i):
-        for y in y_list:
+        for y in ylist:
           self.grid[x % self.number_columns][y % self.number_rows].is_occupied = False
       # Loop to 'add' the entity of the environment grid after the movement
       for x in range(xstart+xm, xstart, x_i):
-        for y in y_list:
+        for y in ylist:
           self.grid[x % self.number_columns][y % self.number_rows].is_occupied = True
     
     # Case 3
     elif xm == 0 and ym > 0:
       # Loop to 'remove' the entity of the environment grid after the movement
-      for x in x_list:
+      for x in xlist:
         for y in range(ystart, ystart+ym, y_i):
           self.grid[x % self.number_columns][y % self.number_rows].is_occupied = False
       # Loop to 'add' the entity of the environment grid after the movement
-      for x in x_list:
+      for x in xlist:
         for y in range(yend, yend+ym, y_i):
           self.grid[x % self.number_columns][y % self.number_rows].is_occupied = True
 
     # Case 4
     elif xm == 0 and ym < 0:
       # Loop to 'remove' the entity of the environment grid after the movement
-      for x in x_list:
+      for x in xlist:
         for y in range(yend+ym, yend, y_i):
           self.grid[x % self.number_columns][y % self.number_rows].is_occupied = False
       # Loop to 'add' the entity of the environment grid after the movement
-      for x in x_list:
+      for x in xlist:
         for y in range(ystart+ym, ystart, y_i):
           self.grid[x % self.number_columns][y % self.number_rows].is_occupied = True
 
@@ -342,11 +338,9 @@ class Environment:
 #############
 if __name__ == "__main__":
   env = Environment(100,100)
-  print(len(env.grid))
-  blobby = Cell(40,40)
-  print(blobby.occupied_x_coord)
-  for i in range(100):
-    print(blobby)
-    blobby.Moving(enviro=env)
-  print(env)
-
+  blobby = Cell(env,40,30)
+  blobbou = Cell(env,38,17)
+  for i in range(20):
+    print(env)
+    blobby.Moving(env,(-0.5,-0.5))
+    t.sleep(1)

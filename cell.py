@@ -20,8 +20,8 @@ class Cell:
   """
   # Visual caracteristic
   width, length = (10,10)
-  birth_color: tuple = (255, 102, 0)
-  death_color: tuple = (0, 12, 255)
+  birth_color: tuple = (0, 12, 255)
+  death_color: tuple = (0, 0, 0)
   # Cell parameter
   mvmt_speed: float = 1
   # The number of times the cell replicates itself in one iteration of the game loop
@@ -33,15 +33,16 @@ class Cell:
   occupied_y_coord: np.array = np.empty(shape=(width,length))
 
 
-  def __init__(self, pos_x: int = 0, pos_y: int = 0):
+  def __init__(self, enviro, pos_x: int = 0, pos_y: int = 0):
     # The starting position of the cell
     self.x: int = pos_x
     self.y: int = pos_y
     
     # Initialization of the space used by the cell in the environment grid 
-    self.occupied_x_coord = np.array([x for x in range(math.floor(self.x), math.ceil(self.x + self.width), EnvironmentalUnit.width)])
-    self.occupied_y_coord = np.array([y for y in range(math.floor(self.y), math.ceil(self.y + self.length), EnvironmentalUnit.length)])
-    
+    self.occupied_x_coord = np.array([x for x in range(self.x, self.x + self.width)])#, EnvironmentalUnit.width)])
+    self.occupied_y_coord = np.array([y for y in range(self.y, self.y + self.length)])#, EnvironmentalUnit.length)])
+    enviro.UsedSpace(self, self.occupied_x_coord, self.occupied_y_coord)
+
     # Attributes is in this rectangle tuple format to fit to the pygame.fill() method which fills rectangle objects
     self.attributes = (self.x, self.y, self.width, self.length)
     # When a cell is created, it age is set on 0. The cell is aging over time and it color is changing with it age
@@ -56,7 +57,7 @@ class Cell:
   ###########
   # METHODS #
   ###########
-  def Moving(self, enviro) -> None:
+  def Moving(self, enviro, direction: tuple = Direction.get_random_direction()) -> None:
     """
     This method makes the cell move in a random direction, after checking if the environment in the direction isn't occupied by others cells
     The new coordinates are changed directly using UpdateSpace()
@@ -64,20 +65,22 @@ class Cell:
       enviro (Environment): an object of the instance Environment of environment.py 
     """
     # Computes the potential coordonates of the cell
-    random_direction = Direction.get_random_direction()
-    movement_size: tuple = ((self.mvmt_speed * random_direction[0]), (self.mvmt_speed * random_direction[1]))
-    # Length of the movement is doubled to prevent cells from superposing if they both go in the same direction
-    predict_mvt = (2*movement_size[0], 2*movement_size[1])
-    print(enviro.IsSpace(self.occupied_x_coord, self.occupied_y_coord, predict_mvt))
-    if enviro.IsSpace(self.occupied_x_coord, self.occupied_y_coord, predict_mvt): # checking in the direction of the movement if the cell has space to move
-      enviro.SpaceMvt(self.occupied_x_coord, self.occupied_y_coord, movement_size) # updating occupied space by the cell on the grid
-      self.x = (self.x + movement_size[0]) % enviro.width
-      self.y = (self.y + movement_size[1]) % enviro.length
-      # Updating the lists storing the coordinates of the cell on the environment gridd
-      self.occupied_x_coord = (self.occupied_x_coord + math.ceil(movement_size[0])) % enviro.width
-      self.occupied_y_coord = (self.occupied_y_coord + math.ceil(movement_size[1])) % enviro.length
+    enviro.UsedSpace(self, self.occupied_x_coord, self.occupied_y_coord, True)
+    xm, ym = self.mvmt_speed * direction[0], self.mvmt_speed * direction[1]
+
+    # Cell is moving
+    print(enviro.IsSpace(self.occupied_x_coord, self.occupied_y_coord, (xm,ym)))
+    if enviro.IsSpace(self.occupied_x_coord, self.occupied_y_coord, (xm,ym)):
+      self.x = (self.x + xm) % enviro.width
+      self.y = (self.y + ym) % enviro.length
+      
+      # Updating coordinates on the environmental grid.     
+      self.occupied_x_coord = self.occupied_x_coord + xm
+      self.occupied_y_coord = self.occupied_y_coord + ym
+      
       self.attributes = (self.x, self.y, self.length, self.width)
-    else: pass # The cell don't move if the space is occupied
+    else : pass
+    enviro.UsedSpace(self, self.occupied_x_coord, self.occupied_y_coord)
     return None
 
 

@@ -18,7 +18,6 @@ from environment import Environment
 pygame.init()  # Initiation of pygame -> mandatory
 
 # CREATION OF THE WINDOW
-
 window_edge = 600  # in pixels
 # Creation of the main window -> size : window_surface x window_surface
 main_window = pygame.display.set_mode((window_edge, window_edge))
