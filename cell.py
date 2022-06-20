@@ -145,4 +145,3 @@ if __name__ == "__main__":
   movement = (5,5)
   blob.UpdateSpace(movement)
   print("x coordonates : ",blob.occupied_x_coord, "\n y coordonates : ", blob.occupied_y_coord)
-

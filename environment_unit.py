@@ -17,7 +17,6 @@ class EnvironmentalUnit:
     List of all int x in the object
   ylist : list
     List of all int y in the object
-  Method
   -------
   """
   # Dimensions
@@ -25,7 +24,13 @@ class EnvironmentalUnit:
   width: int = 2
   # Attributes telling if it is occupied or not
   is_occupied: bool = False
-  contained_entity: list = []
+  # Values giving the quantity of nutrients inside the unit
+  glucose = 0  # in g
+  oxygen  = 0 # in g
+  nitrogen = 0  # in g
+  temperature = 37 # in °C
+  co2 = 0 # in g
+
   
   # FONDAMENTAL METHODS
   def __init__(self, posx: int, posy: int):

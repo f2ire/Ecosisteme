@@ -15,7 +15,7 @@ class Environment:
   Class stocking multiple environment_unit
   
   """
-  def __init__(self, length: int, width: int) -> None:
+  def __init__(self, length: int, width: int, temperature: float = 37) -> None:
     """Initialize an environment with a length * width size
     Args:
       length (int): length of the environment (length of window in pixel)
@@ -28,7 +28,7 @@ class Environment:
     
     # Create a grid with an EnvironmentalUnit object in each columns and that for each rows
     self.grid: list = [
-      [EnvironmentalUnit(x * EnvironmentalUnit.width, y * EnvironmentalUnit.length,)
+      [EnvironmentalUnit(x * EnvironmentalUnit.width, y * EnvironmentalUnit.length, temperature)
       for x in range(self.number_columns)]
       for y in range(self.number_rows)
     ]
@@ -57,7 +57,7 @@ class Environment:
   ###########
   # METHODS #
   ###########
-  def UsedSpace(self, entity ,xlist: np.array, ylist: np.array, delete: bool = False) -> None:
+  def UsedSpace(self, entity, xlist: np.array, ylist: np.array, delete: bool = False) -> None:
     """ Sets all the coordinates of the environment grid occupied by the cell on 'occupied' or 'not occupied' depending on the value of delete.
     
     Args:
@@ -213,135 +213,6 @@ class Environment:
           else:pass
       # If after the checking of all the space where the action will take place, no unit is occupied it returns True
       return True
-
-
-  def SpaceMvt(self, xlist: np.array, ylist: np.array, movement: tuple) -> None:
-    """ Removes an entity from it's actual location in the environment grid and adds it next location in the environment grid.
-
-    Args:
-      xlist (np.array): array containing every coordinates on the environment grid of an entity along the x axis 
-      ylist (np.array): array containing every coordinates on the environment grid of an entity along the y axis 
-      movement (tuple): tuple of movement 'length' along x and y axes such as (xm,ym)
-    """
-    xm, ym = movement[0], movement[1]
-
-    # +- 1 to extend the range of the search and minimize the leftovers (?)
-    xstart, ystart, xend, yend = xlist[0]-1, ylist[0]-1, xlist[-1]+1, ylist[-1]+1
-    # Increments for the for loops because we need only to go from an unit to another
-    x_i, y_i = EnvironmentalUnit.width, EnvironmentalUnit.length 
-
-    # 8 cases in total
-    # Case 1
-    if xm > 0 and ym == 0:
-      # Loop to 'remove' the entity of the environment grid after the movement
-      for x in range(xstart, xstart+xm, x_i):
-        for y in ylist:
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = False
-      # Loop to 'add' the entity of the environment grid after the movement
-      for x in range(xend, xend+xm, x_i):
-        for y in ylist:
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = True
-    
-    # Case 2 
-    elif xm < 0 and ym == 0:
-      # Loop to 'remove' the entity of the environment grid after the movement
-      for x in range(xend+xm, xend, x_i):
-        for y in ylist:
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = False
-      # Loop to 'add' the entity of the environment grid after the movement
-      for x in range(xstart+xm, xstart, x_i):
-        for y in ylist:
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = True
-    
-    # Case 3
-    elif xm == 0 and ym > 0:
-      # Loop to 'remove' the entity of the environment grid after the movement
-      for x in xlist:
-        for y in range(ystart, ystart+ym, y_i):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = False
-      # Loop to 'add' the entity of the environment grid after the movement
-      for x in xlist:
-        for y in range(yend, yend+ym, y_i):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = True
-
-    # Case 4
-    elif xm == 0 and ym < 0:
-      # Loop to 'remove' the entity of the environment grid after the movement
-      for x in xlist:
-        for y in range(yend+ym, yend, y_i):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = False
-      # Loop to 'add' the entity of the environment grid after the movement
-      for x in xlist:
-        for y in range(ystart+ym, ystart, y_i):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = True
-
-    # Case 5
-    elif xm > 0 and ym > 0:
-      # Loops to 'remove' the entity of the environment grid after the movement
-      for x in range(xstart, xend, x_i):
-        for y in range(ystart, ystart+ym, y_i):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = False
-      for x in range(xstart, xstart+xm, x_i):
-        for y in range(ystart+ym, yend, y_i):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = False
-      # Loops to 'add' the entity of the environment grid after the movement
-      for x in range(xend, xend+xm, x_i):
-        for y in range(ystart+ym, yend+ym, y_i):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = True
-      for x in range(xstart+xm, xend, x_i):
-        for y in range(yend, yend+ym, y_i):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = True
-    
-    # Case 6
-    elif xm > 0 and ym < 0:
-      # Loops to 'remove' the entity of the environment grid after the movement
-      for x in range(xstart, xstart+xm, x_i):
-        for y in range(ystart, yend, y_i):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = False
-      for x in range(xstart+xm, xend, x_i):
-        for y in range(ystart+ym, ystart, y_i):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = False
-      # Loops to 'add' the entity of the environment grid after the movement
-      for x in range(xstart+xm, xend+xm, x_i):
-        for y in range(ystart+ym, ystart, y_i):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = True
-      for x in range(xend, xend+xm, x_i):
-        for y in range(ystart, yend+ym, y_i):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = True
-
-    # Case 7
-    elif xm < 0 and ym > 0:
-      # Loops to 'remove' the entity of the environment grid after the movement
-      for x in range(xstart, xend, x_i):
-        for y in range(ystart, ystart+ym, y_i):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = False
-      for x in range(xend+xm, xend, x_i):
-        for y in range(ystart+ym, yend, y_i):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = False
-      # Loops to 'add' the entity of the environment grid after the movement
-      for x in range(xstart+xm, xstart, x_i):
-        for y in range(ystart+ym, yend+ym, y_i):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = True
-      for x in range(xstart, xend+xm, x_i):
-        for y in range(yend, yend+ym, y_i):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = True
-    
-    # Case 8
-    elif xm < 0 and ym < 0:
-      # Loops to 'remove' the entity of the environment grid after the movement
-      for x in range(xstart, xend, x_i):
-        for y in range(yend+ym, yend, y_i):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = False
-      for x in range(xend+xm, xend, x_i):
-        for y in range(ystart, yend+ym, y_i):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = False
-      # Loops to 'add' the entity of the environment grid after the movement
-      for x in range(xstart+xm, xend+xm, x_i):
-        for y in range(ystart+ym, ystart, y_i):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = True
-      for x in range(xstart+x, xstart, x_i):
-        for y in range(ystart, yend+ym, y_i):
-          self.grid[x % self.number_columns][y % self.number_rows].is_occupied = True.is_occupied
 
 
 #############
