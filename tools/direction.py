@@ -42,3 +42,7 @@ class Direction:
         Direction.WEST
       ]
     )
+
+if __name__ == "__main__":
+  for i in range(5):
+    print(Direction.get_random_direction())
