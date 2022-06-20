@@ -25,7 +25,7 @@ class Cell:
   # Cell parameter
   mvmt_speed: float = 1
   # The number of times the cell replicates itself in one iteration of the game loop
-  growth_rate: float = 1 / 3500
+  growth_rate: float = 1 / 1000
   
   max_age: int = 6000 
   # Square in the Environment grid used by the cell -> using np to fasten the computations
@@ -39,8 +39,8 @@ class Cell:
     self.y: int = pos_y
     
     # Initialization of the space used by the cell in the environment grid 
-    self.occupied_x_coord = np.array([x for x in range(self.x, self.x + self.width)])#, EnvironmentalUnit.width)])
-    self.occupied_y_coord = np.array([y for y in range(self.y, self.y + self.length)])#, EnvironmentalUnit.length)])
+    self.occupied_x_coord = np.array([x for x in range(math.floor(self.x), math.floor(self.x) + self.width)])#, EnvironmentalUnit.width)])
+    self.occupied_y_coord = np.array([y for y in range(math.floor(self.y), math.floor(self.y) + self.length)])#, EnvironmentalUnit.length)])
     enviro.UsedSpace(self, self.occupied_x_coord, self.occupied_y_coord)
 
     # Attributes is in this rectangle tuple format to fit to the pygame.fill() method which fills rectangle objects
@@ -57,24 +57,29 @@ class Cell:
   ###########
   # METHODS #
   ###########
-  def Moving(self, enviro, direction: tuple = Direction.get_random_direction()) -> None:
+  def Moving(self, enviro, direction: tuple = ()) -> None:
     """
     This method makes the cell move in a random direction, after checking if the environment in the direction isn't occupied by others cells
     The new coordinates are changed directly using UpdateSpace()
     Args :
       enviro (Environment): an object of the instance Environment of environment.py 
     """
+    if direction == ():
+      direction = Direction.get_random_direction()
+    else:pass
+    #print(direction)
+
     # Computes the potential coordonates of the cell
     enviro.UsedSpace(self, self.occupied_x_coord, self.occupied_y_coord, True)
     xm, ym = self.mvmt_speed * direction[0], self.mvmt_speed * direction[1]
 
     # Cell is moving
-    print(enviro.IsSpace(self.occupied_x_coord, self.occupied_y_coord, (xm,ym)))
+    #print(enviro.IsSpace(self.occupied_x_coord, self.occupied_y_coord, (xm,ym)))
     if enviro.IsSpace(self.occupied_x_coord, self.occupied_y_coord, (xm,ym)):
       self.x = (self.x + xm) % enviro.width
       self.y = (self.y + ym) % enviro.length
       
-      # Updating coordinates on the environmental grid.     
+      # Updating coordinates on the environmental grid.
       self.occupied_x_coord = self.occupied_x_coord + xm
       self.occupied_y_coord = self.occupied_y_coord + ym
       
@@ -92,12 +97,16 @@ class Cell:
       cells_list (list): the list of all the cells of our environment
     """
     is_replicating = random.random() <= self.growth_rate # boolean checking if the cell will replicate itself based on it division probability 
+    #print("is_replicatig:",is_replicating)
     if is_replicating:
       random_direction = Direction.GetRandomReplicationDirection()
+      #print("rdm dir :",random_direction)
       replication_range = (self.width*random_direction[0], self.length*random_direction[1])
-      if enviro.IsSpace(self.occupied_x_coord, self.occupied_y_coord, replication_range):
-        daughter_cell = Cell(self.x + self.width * random_direction[0], self.y + self.length * random_direction[1])
-        enviro.UsedSpace(daughter_cell.occupied_x_coord, daughter_cell.occupied_y_coord) # initialise the space occupied by the daughter cell on the environment grid
+      is_space = enviro.IsSpace(self.occupied_x_coord, self.occupied_y_coord, replication_range)
+      #print("is_space :",is_space)
+      if is_space:
+        daughter_cell = Cell(enviro,self.x + self.width * random_direction[0], self.y + self.length * random_direction[1])
+        enviro.UsedSpace(daughter_cell, daughter_cell.occupied_x_coord, daughter_cell.occupied_y_coord) # initialise the space occupied by the daughter cell on the environment grid
         cells_list.append(daughter_cell)
       else : pass
     else : pass

@@ -66,6 +66,7 @@ class Environment:
       xlist (np.array): array containing every coordinates on the environment grid of an entity along the x axis 
       ylist (np.array): array containing every coordinates on the environment grid of an entity along the y axis 
     """
+    #print(math.floor(xlist[0]), math.floor(xlist[-1]), math.floor(ylist[0]), math.floor(ylist[-1]))
     for x in xlist:
       for y in ylist:
         self.grid[math.floor(x) % self.number_columns][math.floor(y) % self.number_rows].is_occupied = not delete
@@ -96,7 +97,7 @@ class Environment:
       ym = math.floor(2*direction[1])
 
     xstart, ystart, xend, yend = math.floor(xlist[0]), math.floor(ylist[0]), math.floor(xlist[-1]), math.floor(ylist[-1])
-    print(xstart,xend,xm,";",ystart,yend,ym)
+    #print(xstart,xend,xm,";",ystart,yend,ym)
     # Increments for the for loops because we need only to go from an unit to another
     #x_i, y_i = EnvironmentalUnit.width, EnvironmentalUnit.length useless for the moment
   
@@ -105,7 +106,8 @@ class Environment:
     if xm > 0 and ym == 0:
       for x in range(xend, xend+xm):
         for y in ylist:
-          if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
+          #print(x,y)
+          if self.grid[x % self.number_columns][math.floor(y) % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
       # If after the checking of all the space where the action will take place, no unit is occupied it returns True
@@ -115,7 +117,8 @@ class Environment:
     elif xm < 0 and ym == 0:
       for x in range(xstart+xm, xstart):
         for y in ylist:
-          if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
+          #print(x,y)
+          if self.grid[x % self.number_columns][math.floor(y) % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
       # If after the checking of all the space where the action will take place, no unit is occupied it returns True
@@ -125,7 +128,8 @@ class Environment:
     elif xm == 0 and ym > 0:
       for x in xlist:
         for y in range(yend, yend+ym):
-          if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
+          #print(x,y)
+          if self.grid[math.floor(x) % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
       # If after the checking of all the space where the action will take place, no unit is occupied it returns True
@@ -135,7 +139,8 @@ class Environment:
     elif xm == 0 and ym < 0:
       for x in xlist:
         for y in range(ystart+ym, ystart):
-          if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
+          #print(x,y)
+          if self.grid[math.floor(x) % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
       # If after the checking of all the space where the action will take place, no unit is occupied it returns True
@@ -145,11 +150,13 @@ class Environment:
     elif xm > 0 and ym > 0:
       for x in range(xend, xend+xm):
         for y in range(ystart+ym, yend+ ym):
+          #print(x,y)
           if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
       for x in range(xstart+xm, xend):
         for y in range(yend, yend+ym):
+          #print(x,y)
           if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
@@ -160,11 +167,13 @@ class Environment:
     elif xm > 0 and ym < 0:
       for x in range(xend, xend+xm):
         for y in range(ystart+ym, yend+ ym):
+          #print(x,y)
           if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
       for x in range(xstart+xm, xend):
         for y in range(ystart+ym, ystart):
+          #print(x,y)
           if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
@@ -175,11 +184,13 @@ class Environment:
     elif xm < 0 and ym > 0:
       for x in range(xstart+xm, xstart):
         for y in range(ystart+ym, yend+ym):
+          #print(x,y)
           if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
       for x in range(xstart, xend+xm):
         for y in range(yend, yend+ym):
+          #print(x,y)
           if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
@@ -190,13 +201,13 @@ class Environment:
     else:
       for x in range(xstart+xm, xstart):
         for y in range(ystart+ym, yend+ym):
-          print(x,y)
-          if self.grid[x % self.number_columns][y % self.number_rows]: # if one 'pixel' is occupied then it returns False
+          #print(x,y)
+          if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
       for x in range(xstart, xend+xm):
         for y in range(ystart+ym, ystart):
-          print(x,y)
+          #print(x,y)
           if self.grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
             return False
           else:pass
@@ -338,9 +349,9 @@ class Environment:
 #############
 if __name__ == "__main__":
   env = Environment(100,100)
-  blobby = Cell(env,40,30)
-  blobbou = Cell(env,38,17)
-  for i in range(20):
+  blobby = Cell(env,25,30)
+  blobbou = Cell(env,18,17)
+  for i in range(15):
     print(env)
-    blobby.Moving(env,(-0.5,-0.5))
+    blobby.Moving(env)
     t.sleep(1)

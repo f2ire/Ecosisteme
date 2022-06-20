@@ -25,13 +25,13 @@ bg_color = (255, 255, 255)  # WHITE for the background color
 main_window.fill(bg_color)  # Colouring the window
 
 # CREATION OF THE ENVIRONMENT GRID
-Env = Environment(window_edge, window_edge) # same dimensions as the window
+env = Environment(window_edge, window_edge) # same dimensions as the window
 
 # MANAGING CELLS
 # Creating a cell in the middle of our window and initiating it
-first_cell = Cell(window_edge // 2, window_edge // 2) ; print(first_cell.occupied_x_coord)
+first_cell = Cell(env,window_edge // 2, window_edge // 2) ; print(first_cell.occupied_x_coord)
 cells_list = [first_cell]
-Env.UsedSpace(first_cell.occupied_x_coord, first_cell.occupied_y_coord)
+env.UsedSpace(first_cell, first_cell.occupied_x_coord, first_cell.occupied_y_coord)
 main_window.fill(first_cell.color, first_cell.attributes)
 
 # For displaying the number of cells over time
@@ -52,14 +52,14 @@ while True:
     for c in cells_list:
       if c.IsTooOld():
         # Remove cell object and end loop
-        Env.UsedSpace(c.occupied_y_coord, c.occupied_y_coord, delete=True)
+        env.UsedSpace(c, c.occupied_x_coord, c.occupied_y_coord, delete=True)
         cells_list.remove(c)
         break
       else:
         c.age += 1
         c.AdaptColor()
-        c.Moving(Env)
-        c.Replicating(Env,cells_list)
+        c.Moving(env)
+        c.Replicating(env,cells_list)
     
         main_window.fill(c.color, c.attributes)
 
