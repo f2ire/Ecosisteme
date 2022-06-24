@@ -19,13 +19,13 @@ class EnvironmentalUnit:
     List of all int y in the object
   -------
   """
-  # Dimensions
+  
   length: int = 2
   width: int = 2
-  # Attributes telling if it is occupied or not
+
   is_occupied: bool = False
-  # Values giving the quantity of nutrients inside the unit
-  nutrient: float = 0 # in g
+  
+  nutrient: float = 0 # in g/L
   #glucose: float = 0  # in g
   #oxygen: float = 0 # in g
   #nitrogen: float = 0  # in g

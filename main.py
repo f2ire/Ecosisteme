@@ -49,19 +49,19 @@ while True:
     break
 
   else:
-    for c in cells_list:
-      if c.isTooOld():
+    for a_cell in cells_list:
+      if a_cell.isTooOld():
         # Remove cell object and end loop
-        world.usedSpace(c, c.occupied_x_coord, c.occupied_y_coord, delete=True)
-        cells_list.remove(c)
+        world.usedSpace(a_cell, a_cell.occupied_x_coord, a_cell.occupied_y_coord, delete=True)
+        cells_list.remove(a_cell)
         break
       else:
-        c.age += 1
-        c.adaptColor()
-        c.moving(world)
-        c.replicating(world,cells_list)
+        a_cell.age += 1
+        a_cell.adaptColor()
+        a_cell.moving(world)
+        a_cell.replicating(world,cells_list)
     
-        main_window.fill(c.color, c.attributes)
+        main_window.fill(a_cell.color, a_cell.attributes)
 
   if step % 100 == 0:  # divide by 100 number of data
     logger.countingCell()
