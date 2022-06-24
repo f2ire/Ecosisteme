@@ -12,10 +12,16 @@ import time as t
 ####################
 class Environment:
   """
-  Class stocking multiple environment_unit
-  
+  Class stocking multiple environment_unit in a double array
   """
-  def __init__(self, length: int, width: int, temperature: float = 37) -> None:
+  # Parameters 
+  nutrients_diffusion = 0.05 # in g/min
+  #glucose_diffusion = 0.004 # in g/min
+  #nitrogen_diffusion = 0.02 # in g/min
+  #oxygen_diffusion = 3 # in g/min
+  #co2_diffusion = 1 # in g/min
+
+  def __init__(self, length: int, width: int) -> None:
     """Initialize an environment with a length * width size
     Args:
       length (int): length of the environment (length of window in pixel)
@@ -28,7 +34,7 @@ class Environment:
     
     # Create a grid with an EnvironmentalUnit object in each columns and that for each rows
     self.grid: list = [
-      [EnvironmentalUnit(x * EnvironmentalUnit.width, y * EnvironmentalUnit.length, temperature)
+      [EnvironmentalUnit(x * EnvironmentalUnit.width, y * EnvironmentalUnit.length)
       for x in range(self.number_columns)]
       for y in range(self.number_rows)
     ]
@@ -57,7 +63,7 @@ class Environment:
   ###########
   # METHODS #
   ###########
-  def UsedSpace(self, entity, xlist: np.array, ylist: np.array, delete: bool = False) -> None:
+  def usedSpace(self, entity, xlist: np.array, ylist: np.array, delete: bool = False) -> None:
     """ Sets all the coordinates of the environment grid occupied by the cell on 'occupied' or 'not occupied' depending on the value of delete.
     
     Args:
@@ -73,7 +79,7 @@ class Environment:
     return None
 
 
-  def IsSpace(self, xlist: np.array, ylist: np.array, direction: tuple) -> bool:
+  def isSpace(self, xlist: np.array, ylist: np.array, direction: tuple) -> bool:
     """ Checks if the environment units in a certain direction are available for the entity to move or replicate
 
     Args:
@@ -214,6 +220,33 @@ class Environment:
       # If after the checking of all the space where the action will take place, no unit is occupied it returns True
       return True
 
+  def diffusingNutrients(self)-> None:
+    """Adjusts the nutrients in every environmental units according to the diffusion rates and the gradient. 
+    The idea is to check if the units in the neighbourhood (upward, downward, right and leftward) contain more nutrients and simulate 
+    the creation of a gradient.
+    """
+    nutrientEvolutionCounter = 0 # -1 when nutrient mater is out pumped from the unit, +1 otherwise
+    for x in range(self.length,EnvironmentalUnit.length):
+      for y in range(self.width,EnvironmentalUnit.width):
+        if self.grid[(x-1)%self.number_columns][y].nutrient < self.grid[x][y].nutrient: # leftward
+          nutrientEvolutionCounter -= 1
+        else:
+          nutrientEvolutionCounter += 1
+        if self.grid[(x+1)%self.number_columns][y].nutrient < self.grid[x][y].nutrient: # rightward
+          nutrientEvolutionCounter -= 1
+        else:
+          nutrientEvolutionCounter += 1
+        if self.grid[x][(y-1)%self.number_rows].nutrient < self.grid[x][y].nutrient: # upward
+          nutrientEvolutionCounter -= 1
+        else:
+          nutrientEvolutionCounter += 1
+        if self.grid[x][(y+1)%self.number_rows].nutrient < self.grid[x][y].nutrient: # downward
+          nutrientEvolutionCounter -= 1
+        else:
+          nutrientEvolutionCounter += 1
+
+        # Updtading the number of nutrient in an environmental unit 
+        self.grid[x][y].nutrient = self.grid[x][y].nutrient + nutrientEvolutionCounter*self.grid[x][y].nutrient*self.nutrients_diffusion
 
 #############
 # MAIN CODE #
@@ -224,5 +257,5 @@ if __name__ == "__main__":
   blobbou = Cell(env,18,17)
   for i in range(15):
     print(env)
-    blobby.Moving(env)
+    blobby.moving(env)
     t.sleep(1)

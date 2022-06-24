@@ -6,6 +6,7 @@ import random
 import numpy as np
 from tools.direction import Direction
 from environment_unit import EnvironmentalUnit
+from environment import Environment
 
 ####################
 # CLASS DEFINITION #
@@ -25,9 +26,10 @@ class Cell:
   # Cell parameter
   mvmt_speed: float = 1
   # The number of times the cell replicates itself in one iteration of the game loop
-  growth_rate: float = 1 / 1000
+  replication_rate: float = 1 / 1000
   
-  max_age: int = 6000 
+  max_age: int = 6000 # number of time of the game loop the cell is going to survive
+  
   # Square in the Environment grid used by the cell -> using np to fasten the computations
   occupied_x_coord: np.array = np.empty(shape=(width,length))
   occupied_y_coord: np.array = np.empty(shape=(width,length))
@@ -41,7 +43,7 @@ class Cell:
     # Initialization of the space used by the cell in the environment grid 
     self.occupied_x_coord = np.array([x for x in range(math.floor(self.x), math.floor(self.x) + self.width)])#, EnvironmentalUnit.width)])
     self.occupied_y_coord = np.array([y for y in range(math.floor(self.y), math.floor(self.y) + self.length)])#, EnvironmentalUnit.length)])
-    enviro.UsedSpace(self, self.occupied_x_coord, self.occupied_y_coord)
+    enviro.usedSpace(self, self.occupied_x_coord, self.occupied_y_coord)
 
     # Attributes is in this rectangle tuple format to fit to the pygame.fill() method which fills rectangle objects
     self.attributes = (self.x, self.y, self.width, self.length)
@@ -57,25 +59,27 @@ class Cell:
   ###########
   # METHODS #
   ###########
-  def Moving(self, enviro, direction: tuple = ()) -> None:
+  def moving(self, enviro: Environment, direction: tuple = ()) -> None:
     """
     This method makes the cell move in a random direction, after checking if the environment in the direction isn't occupied by others cells
     The new coordinates are changed directly using UpdateSpace()
     Args :
       enviro (Environment): an object of the instance Environment of environment.py 
+      direction (tuple): tuple containing the x and y coordinates of the movement
     """
+    
     if direction == ():
-      direction = Direction.get_random_direction()
+      direction = Direction.getRandomDirection()
     else:pass
     #print(direction)
 
     # Computes the potential coordonates of the cell
-    enviro.UsedSpace(self, self.occupied_x_coord, self.occupied_y_coord, True)
+    enviro.usedSpace(self, self.occupied_x_coord, self.occupied_y_coord, True)
     xm, ym = self.mvmt_speed * direction[0], self.mvmt_speed * direction[1]
 
     # Cell is moving
     #print(enviro.IsSpace(self.occupied_x_coord, self.occupied_y_coord, (xm,ym)))
-    if enviro.IsSpace(self.occupied_x_coord, self.occupied_y_coord, (xm,ym)):
+    if enviro.isSpace(self.occupied_x_coord, self.occupied_y_coord, (xm,ym)):
       self.x = (self.x + xm) % enviro.width
       self.y = (self.y + ym) % enviro.length
       
@@ -85,35 +89,33 @@ class Cell:
       
       self.attributes = (self.x, self.y, self.length, self.width)
     else : pass
-    enviro.UsedSpace(self, self.occupied_x_coord, self.occupied_y_coord)
+    enviro.usedSpace(self, self.occupied_x_coord, self.occupied_y_coord)
     return None
 
 
-  def Replicating(self, enviro, cells_list: list) -> None:
+  def replicating(self, enviro, cells_list: list) -> None:
     """
     Add a new cell to cells_list if their is enough space to create it. 
     Args :
       enviro (Environment): an object of the instance Environment of environment.py
       cells_list (list): the list of all the cells of our environment
     """
-    is_replicating = random.random() <= self.growth_rate # boolean checking if the cell will replicate itself based on it division probability 
-    #print("is_replicatig:",is_replicating)
-    if is_replicating:
-      random_direction = Direction.GetRandomReplicationDirection()
+    if self.isReplicationPossible():
+      random_direction = Direction.getRandomReplicationDirection()
       #print("rdm dir :",random_direction)
       replication_range = (self.width*random_direction[0], self.length*random_direction[1])
-      is_space = enviro.IsSpace(self.occupied_x_coord, self.occupied_y_coord, replication_range)
+      is_space = enviro.usedSpace(self.occupied_x_coord, self.occupied_y_coord, replication_range)
       #print("is_space :",is_space)
       if is_space:
         daughter_cell = Cell(enviro,self.x + self.width * random_direction[0], self.y + self.length * random_direction[1])
-        enviro.UsedSpace(daughter_cell, daughter_cell.occupied_x_coord, daughter_cell.occupied_y_coord) # initialise the space occupied by the daughter cell on the environment grid
+        enviro.usedSpace(daughter_cell, daughter_cell.occupied_x_coord, daughter_cell.occupied_y_coord) # initialise the space occupied by the daughter cell on the environment grid
         cells_list.append(daughter_cell)
       else : pass
     else : pass
     return None
 
 
-  def IsTooOld(self) -> bool:
+  def isTooOld(self) -> bool:
     """
     Returns True if the cell's age is superior to its max_age
     """
@@ -123,7 +125,7 @@ class Cell:
       return False
 
 
-  def AdaptColor(self) -> None:
+  def adaptColor(self) -> None:
     """
     Linear interpolation to determine the cell's color depending of its age
     """
@@ -134,6 +136,15 @@ class Cell:
       (1 - alpha) * self.birth_color[2] + alpha * self.death_color[2],
     )
     return None
+
+  def isReplicationPossible(self) -> bool:
+    """Takes a random number between 0 and 1 and checks if it is lower than the replication rate of the cell
+
+    Returns:
+      bool: True if the cell is randomly capable of replicating itself
+    """
+    return random.random() <= self.replication_rate
+
 
 
 #############

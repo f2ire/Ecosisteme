@@ -30,11 +30,11 @@ class DataLogger:
     self.cell_count = []
 
 
-  def counting_cell(self):
+  def countingCell(self):
     self.cell_count.append(len(self.cell_list))
 
 
-  def draw_cell_number_by_time(self):
+  def drawCellNumberByTime(self):
     plt.plot([i / 10000 for i in range(len(self.cell_count))], self.cell_count)
     plt.title("Number of cell by time")
     plt.ylabel("Number of cell")

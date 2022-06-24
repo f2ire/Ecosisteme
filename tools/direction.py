@@ -12,7 +12,7 @@ class Direction:
   NORTHWEST = (-0.5, 0.5)
 
   @staticmethod
-  def get_random_direction():
+  def getRandomDirection():
     """
     Return a random Direction
     """
@@ -30,7 +30,7 @@ class Direction:
     )
   
   @staticmethod
-  def GetRandomReplicationDirection():
+  def getRandomReplicationDirection():
     """
     Return a random Direction for replication -> chose only between North, South, East adn West
     """
@@ -45,4 +45,4 @@ class Direction:
 
 if __name__ == "__main__":
   for i in range(5):
-    print(Direction.get_random_direction())
+    print(Direction.getRandomDirection())

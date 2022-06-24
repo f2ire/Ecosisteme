@@ -25,13 +25,14 @@ class EnvironmentalUnit:
   # Attributes telling if it is occupied or not
   is_occupied: bool = False
   # Values giving the quantity of nutrients inside the unit
-  glucose = 0  # in g
-  oxygen  = 0 # in g
-  nitrogen = 0  # in g
-  temperature = 37 # in °C
-  co2 = 0 # in g
+  nutrient: float = 0 # in g
+  #glucose: float = 0  # in g
+  #oxygen: float = 0 # in g
+  #nitrogen: float = 0  # in g
+  #temperature: float = 37 # in °C
+  #co2: float = 0 # in g
 
-  
+
   # FONDAMENTAL METHODS
   def __init__(self, posx: int, posy: int):
     """
@@ -43,25 +44,14 @@ class EnvironmentalUnit:
     # Initialization of the position
     self.xlist: list = list(range(posx, posx + self.length))
     self.ylist: list = list(range(posy, posy + self.width))
-  
+
   def __str__(self) -> str:
     return f"Unit at ({self.xlist[0]}, {self.ylist[0]})"
 
   
   # OTHER METHODS
-  def IsInside(self, posx: float, posy: float)-> bool:
-    """True if the given coordinates are contained between the thresholds of xlist and ylist, False if not.
 
-    Args:
-      posx (float): coordinates of an entity along the x axis
-      posy (float): coordinates of an entity along the y axis
 
-    Returns:
-      bool: True if the given coordinates are contained between the thresholds of xlist and ylist, False if not.
-    """
-    if posx < self.xlist[-1] and posx > self.xlist[0] and posy < self.ylist[-1] and posy > self.ylist[0]:
-      return True
-    else : return False
 ############
 # MAIN CODE #
 #############
