@@ -6,6 +6,7 @@ import numpy as np
 from cell import Cell
 from environment_unit import EnvironmentalUnit
 import time as t
+import tools.physical_data as constants
 
 ####################
 # CLASS DEFINITION #
@@ -219,48 +220,49 @@ class Environment:
       # If after the checking of all the space where the action will take place, no unit is occupied it returns True
       return True
 
-  def diffusingNutrients(self)-> None:
+  def glucoseDiffusion(self)-> None:
     """Adjusts the nutrients in every environmental units according to the diffusion rates and the gradient. 
-    The idea is to check if the units in the neighbourhood (upward, downward, right and leftward) contain more nutrients and simulate 
-    the creation of a gradient.
+    The idea is to check if the units in the neighbourhood (upward, downward, right and leftward) contain more glucose and simulate 
+    the creation of a gradient. If the
     """
-    nutrient_evolution_counter = 0 # -1 when nutrient mater is pumped out from the unit, +1 otherwise
+
     for x in range(self.length,EnvironmentalUnit.length):
       for y in range(self.width,EnvironmentalUnit.width):
         if self.isThereMoreNutrientAround((x,y),(x-1,y)):
-          nutrient_evolution_counter += 1
+          leftward_flux = -self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x-1][y].glucose_concentration)
         else:
-          nutrient_evolution_counter -= 1
+          leftward_flux = self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x-1][y].glucose_concentration)
+        
         if self.isThereMoreNutrientAround((x,y),(x+1,y)):
-          nutrient_evolution_counter += 1
+          rightward_flux = -self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x+1][y].glucose_concentration)
         else:
-          nutrient_evolution_counter -= 1
+          rightward_flux = self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x+1][y].glucose_concentration)
+        
         if self.isThereMoreNutrientAround((x,y),(x,y-1)):
-          nutrient_evolution_counter += 1
+          upward_flux = -self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x][y-1].glucose_concentration)
         else:
-          nutrient_evolution_counter -= 1
+          upward_flux = self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x][y-1].glucose_concentration)
+        
         if self.isThereMoreNutrientAround((x,y),(x,y+1)):
-          nutrient_evolution_counter += 1
+          downward_flux = -self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x][y+1].glucose_concentration)
         else:
-          nutrient_evolution_counter -= 1
+          downward_flux = self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x][y+1].glucose_concentration)
 
-        # Updtading the number of nutrient in an environmental unit 
-        self.environment_grid[x][y].nutrient = self.environment_grid[x][y].nutrient + nutrient_evolution_counter*self.environment_grid[x][y].nutrient*self.nutrients_diffusion
+        self.environment_grid[x][y].nutrient += leftward_flux+rightward_flux+upward_flux+downward_flux
 
-  
-  def isThereMoreNutrientAround(self, reference_coordinates: tuple, comparison_coordinates: tuple) -> bool:
-    """Checks and returns True if there is more nutrients in the environmental unit around the reference environmental unit
+
+  def computeGlucoseFlux(self, temperature: float, concentration1: float, concentration2: float) -> float:
+    """Computes J, the flux of matter of glucose between two environmental units in position 1 (reference) and 2
 
     Args:
-      reference_coordinates (tuple) : tuple (x,y) of the position of the reference environmental unit on the environment grid 
-      comparison_coordinates (tuple): tuple (x,y) of the position of the environmental unit around the reference on the environment grid 
+      temperature (float): in Kelvin
+      concentration1 (float): molar concentration of the chemical in position 1, by convention the one of reference in kg/L
+      concentration2 (float): molar concentration of the chemical in position 2 in kg/L
 
     Returns:
-      bool: True if there is more nutrients in the environmental unit around the reference environmental unit
+      float: the flux of matter, in kg/m²/s
     """
-    x_unit_compared, y_unit_compared = comparison_coordinates[0]%self.width, comparison_coordinates[1]%self.length
-    return self.environment_grid[x_unit_compared][y_unit_compared].nutrient > self.environment_grid[reference_coordinates[0]][reference_coordinates[1]].nutrient
-
+    return -constants.density_glucose*constants.computeGlucoseDiffusionCoefficient(temperature)*(concentration1-concentration2)
 
 #############
 # MAIN CODE #

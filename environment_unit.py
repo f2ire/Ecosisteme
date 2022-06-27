@@ -25,11 +25,10 @@ class EnvironmentalUnit:
 
   is_occupied: bool = False
   
-  nutrient_concentration: float = 0 # in g/L
-  #glucose_concentration: float = 0 # in g
+  glucose_concentration: float = 0 # in g/L
   #oxygen_concentration: float = 0 # in g
   #nitrogen: float = 0 # in g
-  #temperature: float = 37 # in K
+  temperature: float = 298.15 # in K
   #co2: float = 0 # in g
 
 
@@ -50,6 +49,12 @@ class EnvironmentalUnit:
 
   
   # OTHER METHODS
+  def addGlucose(self, concentration: float) -> None:
+    """Adds concentration to the class attribute glucose_concentration
+
+    Args:
+      concentration (float): value to be added to glucose_concentration, in g/L
+    """
 
 
 ############
