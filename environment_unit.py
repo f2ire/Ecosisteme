@@ -25,11 +25,11 @@ class EnvironmentalUnit:
 
   is_occupied: bool = False
   
-  nutrient: float = 0 # in g/L
-  #glucose: float = 0  # in g
-  #oxygen: float = 0 # in g
-  #nitrogen: float = 0  # in g
-  #temperature: float = 37 # in °C
+  nutrient_concentration: float = 0 # in g/L
+  #glucose_concentration: float = 0 # in g
+  #oxygen_concentration: float = 0 # in g
+  #nitrogen: float = 0 # in g
+  #temperature: float = 37 # in K
   #co2: float = 0 # in g
 
 

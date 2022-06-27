@@ -18,12 +18,7 @@ class Environment:
   number_columns, number_rows = 0,0
 
   environment_grid = []
-  # Parameters 
-  nutrients_diffusion = 0.05 # in g/min
-  #glucose_diffusion = 0.004 # in g/min
-  #nitrogen_diffusion = 0.02 # in g/min
-  #oxygen_diffusion = 3 # in g/min
-  #co2_diffusion = 1 # in g/min
+  
 
   def __init__(self, length: int, width: int) -> None:
     """Initialize an environment with a length * width size

@@ -1,6 +1,11 @@
+###########
+# MODULES #
+###########
 import random
 
-
+####################
+# CLASS DEFINITION #
+####################
 class Direction:
   NORTH = (0, 1)
   NORTHEAST = (0.5, 0.5)
@@ -10,7 +15,10 @@ class Direction:
   SOUTHWEST = (-0.5, -0.5)
   WEST = (-1, 0)
   NORTHWEST = (-0.5, 0.5)
-
+  
+  ###########
+  # METHODS #
+  ###########
   @staticmethod
   def getRandomDirection():
     """
@@ -43,6 +51,9 @@ class Direction:
       ]
     )
 
+#############
+# MAIN CODE #
+#############
 if __name__ == "__main__":
   for i in range(5):
     print(Direction.getRandomDirection())
