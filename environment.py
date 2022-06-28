@@ -194,7 +194,7 @@ class Environment:
         else:
           downward_flux = self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x][y+1].glucose_concentration)
 
-        self.environment_grid[x][y].nutrient += leftward_flux+rightward_flux+upward_flux+downward_flux
+        self.environment_grid[x][y].changeGlucoseConcentration(leftward_flux+rightward_flux+upward_flux+downward_flux)
 
 
   def computeGlucoseFlux(self, temperature: float, concentration1: float, concentration2: float) -> float:
@@ -226,12 +226,33 @@ class Environment:
     return self.environment_grid[x_ref][y_ref] < self.environment_grid[x_comparison][y_comparison]
 
 
-  def printTemperatureMap(self) -> None:
+  def displayTemperatureMap(self) -> None:
+    """Display the temperature map of the environment using pygame
+    """
     pygame.init()
-    temperature_map = pygame.display.set_mode((self.width, self.length))
+    temperature_map = pygame.display.set_mode((self.width+10, self.length+10))
+    self.computeAllTemperatureColors()
+    while True:
+      event = pygame.event.poll()  # Collecting an event from the user
+      if event.type == pygame.QUIT:  # End loop if user click on cross butun
+        break
+
+      for x in range(self.number_columns):
+        for y in range(self.number_rows):
+          temperature_map.fill(self.environment_grid[x][y].temperature_color, self.environment_grid[x][y].rectangle_tuple)
+          pygame.display.flip()
+    pygame.quit()
 
 
-  def printGlucoseMap(self) -> None:
+  def computeAllTemperatureColors(self) -> None:
+    """For each environmtal units in the environment grid, computes its temperature_color with the adaptTemperatureColor function 
+    """
+    for x in range(self.number_columns):
+      for y in range(self.number_rows):
+        self.environment_grid[x][y].adaptTemperatureColor()
+
+
+  def displayGlucoseMap(self) -> None:
     pygame.init()
     glucose_map = pygame.display.set_mode((self.width, self.length))
 
@@ -242,8 +263,8 @@ if __name__ == "__main__":
   environment = Environment(100,100)
   immobile_cell = Cell(environment,25,30)
   mobile_cell = Cell(environment,18,17)
-
-  for i in range(15):
-    print(environment)
-    mobile_cell.moving(environment, direction=(0,1))
-    t.sleep(1)
+  environment.displayTemperatureMap()
+  #for i in range(15):
+  #  print(environment)
+  #  mobile_cell.moving(environment, direction=(0,1))
+  #  t.sleep(1)

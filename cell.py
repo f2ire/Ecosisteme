@@ -22,7 +22,7 @@ class Cell:
   birth_color: tuple = (0, 12, 255)
   death_color: tuple = (0, 0, 0)
   # Cell parameter
-  mvmt_speed: float = 1
+  movement_size: float = 1
   # The number of times the cell replicates itself in one iteration of the game loop
   replication_rate: float = 1 / 1000
   
@@ -45,8 +45,7 @@ class Cell:
     self.occupied_y_coord = np.array([y for y in range(math.floor(self.y), math.floor(self.y) + self.length)])#, EnvironmentalUnit.length)])
     environment.usedSpace(self, self.occupied_x_coord, self.occupied_y_coord)
 
-    # Attributes is in this rectangle tuple format to fit to the pygame.fill() method which fills rectangle objects
-    self.attributes = (self.x, self.y, self.width, self.length)
+    self.rectangle_tuple = (self.x, self.y, self.width, self.length)
     # When a cell is created, it age is set on 0. The cell is aging over time and it color is changing with it age
     self.age = 0
     self.color = Cell.birth_color
@@ -74,7 +73,7 @@ class Cell:
     #print(direction)
 
     environment.usedSpace(self, self.occupied_x_coord, self.occupied_y_coord, True) # delete the space used by the cell
-    x_movment, y_movement = self.mvmt_speed * direction[0], self.mvmt_speed * direction[1] # Computes the potential coordinates of the cell
+    x_movment, y_movement = self.movement_size * direction[0], self.movement_size * direction[1] # Computes the potential coordinates of the cell
 
     is_space_for_moving = environment.isSpace(self.occupied_x_coord, self.occupied_y_coord, (x_movment,y_movement))
     #print(enviro.IsSpace(self.occupied_x_coord, self.occupied_y_coord, (xm,ym)))
@@ -117,17 +116,6 @@ class Cell:
       return False
 
 
-  def adaptColor(self) -> None:
-    """
-    Linear interpolation to determine the cell's color depending of its age
-    """
-    alpha = self.age / self.max_age
-    self.color = (
-      (1 - alpha) * self.birth_color[0] + alpha * self.death_color[0],
-      (1 - alpha) * self.birth_color[1] + alpha * self.death_color[1],
-      (1 - alpha) * self.birth_color[2] + alpha * self.death_color[2],
-    )
-    return None
 
   def isReplicationPossible(self) -> bool:
     """Takes a random number between 0 and 1 and checks if it is lower than the replication rate of the cell
@@ -152,8 +140,20 @@ class Cell:
     self.occupied_x_coord = self.occupied_x_coord + movement[0]
     self.occupied_y_coord = self.occupied_y_coord + movement[1]
     
-    self.attributes = (self.x, self.y, self.length, self.width)
+    self.rectangle_tuple = (self.x, self.y, self.length, self.width)
 
+  def adaptColor(self) -> None:
+    """
+    Linear interpolation to determine the cell's color depending of its age
+    """
+    alpha = self.age / self.max_age
+    self.color = (
+      (1 - alpha) * self.birth_color[0] + alpha * self.death_color[0],
+      (1 - alpha) * self.birth_color[1] + alpha * self.death_color[1],
+      (1 - alpha) * self.birth_color[2] + alpha * self.death_color[2],
+    )
+    return None
+    
 
 #############
 # MAIN CODE #
