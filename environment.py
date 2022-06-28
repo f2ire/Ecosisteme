@@ -7,6 +7,7 @@ from cell import Cell
 from environment_unit import EnvironmentalUnit
 import time as t
 import tools.physical_data as constants
+import pygame
 
 ####################
 # CLASS DEFINITION #
@@ -107,125 +108,70 @@ class Environment:
     # Increments for the for loops because we need only to go from an unit to another
     #x_i, y_i = EnvironmentalUnit.width, EnvironmentalUnit.length useless for the moment
   
-    # 8 cases in total
-    # Case 1
-    if xm > 0 and ym == 0:
-      for x in range(xend, xend+xm):
-        for y in ylist:
-          #print(x,y)
-          if self.environment_grid[x % self.number_columns][math.floor(y) % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
-            return False
-          else:pass
-      # If after the checking of all the space where the action will take place, no unit is occupied it returns True
-      return True
     
-    # Case 2
+    if xm > 0 and ym == 0:
+      return self.areAllUnitsNotOccupied(xend, xend+xm, ystart, yend)
+
     elif xm < 0 and ym == 0:
-      for x in range(xstart+xm, xstart):
-        for y in ylist:
-          #print(x,y)
-          if self.environment_grid[x % self.number_columns][math.floor(y) % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
-            return False
-          else:pass
-      # If after the checking of all the space where the action will take place, no unit is occupied it returns True
-      return True
+      return self.areAllUnitsNotOccupied(xstart+xm, xstart, ystart, yend)
 
-    # Case 3
     elif xm == 0 and ym > 0:
-      for x in xlist:
-        for y in range(yend, yend+ym):
-          #print(x,y)
-          if self.environment_grid[math.floor(x) % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
-            return False
-          else:pass
-      # If after the checking of all the space where the action will take place, no unit is occupied it returns True
-      return True
+      return self.areAllUnitsNotOccupied(xstart, xend, yend, yend+ym)
 
-    # Case 4
     elif xm == 0 and ym < 0:
-      for x in xlist:
-        for y in range(ystart+ym, ystart):
-          #print(x,y)
-          if self.environment_grid[math.floor(x) % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
-            return False
-          else:pass
-      # If after the checking of all the space where the action will take place, no unit is occupied it returns True
-      return True
+      return self.areAllUnitsNotOccupied(xstart, xend, ystart+ym, ystart)
 
-    # Case 5
     elif xm > 0 and ym > 0:
-      for x in range(xend, xend+xm):
-        for y in range(ystart+ym, yend+ ym):
-          #print(x,y)
-          if self.environment_grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
-            return False
-          else:pass
-      for x in range(xstart+xm, xend):
-        for y in range(yend, yend+ym):
-          #print(x,y)
-          if self.environment_grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
-            return False
-          else:pass
-      # If after the checking of all the space where the action will take place, no unit is occupied it returns True
-      return True
+      if self.areAllUnitsNotOccupied(xend, xend+xm, ystart+ym, yend+ ym):
+        if self.areAllUnitsNotOccupied(xstart+xm, xend, yend, yend+ym):
+          return True
+      return False 
 
-    # Case 6
     elif xm > 0 and ym < 0:
-      for x in range(xend, xend+xm):
-        for y in range(ystart+ym, yend+ ym):
-          #print(x,y)
-          if self.environment_grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
-            return False
-          else:pass
-      for x in range(xstart+xm, xend):
-        for y in range(ystart+ym, ystart):
-          #print(x,y)
-          if self.environment_grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
-            return False
-          else:pass
-      # If after the checking of all the space where the action will take place, no unit is occupied it returns True
-      return True  
+      if self.areAllUnitsNotOccupied(xend, xend+xm, ystart+ym, yend+ ym):
+        if self.areAllUnitsNotOccupied(xstart+xm, xend, ystart+ym, ystart):
+          return True
+      return False 
 
-    # Case 7
     elif xm < 0 and ym > 0:
-      for x in range(xstart+xm, xstart):
-        for y in range(ystart+ym, yend+ym):
-          #print(x,y)
-          if self.environment_grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
-            return False
-          else:pass
-      for x in range(xstart, xend+xm):
-        for y in range(yend, yend+ym):
-          #print(x,y)
-          if self.environment_grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
-            return False
-          else:pass
-      # If after the checking of all the space where the action will take place, no unit is occupied it returns True
-      return True
-
-      # Case 8
+      if self.areAllUnitsNotOccupied(xstart+xm, xstart, ystart+ym, yend+ym):
+        if self.areAllUnitsNotOccupied(xstart, xend+xm, yend, yend+ym):
+          return True
+      return False
+      
     else:
-      for x in range(xstart+xm, xstart):
-        for y in range(ystart+ym, yend+ym):
-          #print(x,y)
-          if self.environment_grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
-            return False
-          else:pass
-      for x in range(xstart, xend+xm):
-        for y in range(ystart+ym, ystart):
-          #print(x,y)
-          if self.environment_grid[x % self.number_columns][y % self.number_rows].is_occupied: # if one 'pixel' is occupied then it returns False
-            return False
-          else:pass
-      # If after the checking of all the space where the action will take place, no unit is occupied it returns True
-      return True
+      if self.areAllUnitsNotOccupied(xstart+xm, xstart, ystart+ym, yend+ym):
+        if self.areAllUnitsNotOccupied(xstart, xend+xm, ystart+ym, ystart):
+          return True
+      return False
 
+  
+  def areAllUnitsNotOccupied(self, starting_x: int, ending_x: int, starting_y: int, ending_y: int) -> bool:
+    """Navigates in all the environmental units of the environment grid between the starting x and y coordinates and the ending x and y. 
+    For each environmental unit encountered, it checks its is_occupied attribute. If it's set on True, then the function returns False.
+    The function returns True if and only if every environmental units have their is_occuied attribute set on False. 
+
+    Args:
+      starting_x (int): x coordinates of the environment grid where to begin the search 
+      ending_x (int): x coordinates of the environment grid where to end the search
+      starting_y (int): y coordinates of the environment grid where to begin the search 
+      ending_y (int): y coordinates of the environment grid where to end the search
+
+    Returns:
+      bool: True if every environmental units have their is_occuied attribute set on False, False otherwise.
+    """
+    for x in range(starting_x, ending_x):
+      for y in range(starting_y, ending_y):
+        if self.environment_grid[x % self.number_columns][y % self.number_rows].is_occupied:
+          return False
+        else:pass
+    return True
+  
   def glucoseDiffusion(self)-> None:
     """Adjusts the nutrients in every environmental units according to the diffusion rates and the gradient. 
     The idea is to check if the units in the neighbourhood (upward, downward, right and leftward) contain more glucose and simulate 
     the creation of a gradient. If the
     """
-
     for x in range(self.length,EnvironmentalUnit.length):
       for y in range(self.width,EnvironmentalUnit.width):
         if self.isThereMoreNutrientAround((x,y),(x-1,y)):
@@ -264,14 +210,40 @@ class Environment:
     """
     return -constants.density_glucose*constants.computeGlucoseDiffusionCoefficient(temperature)*(concentration1-concentration2)
 
+  def isThereMoreNutrientsAround(self, reference_position: tuple, comparison_position: tuple) -> bool:
+    """Returns True if the environmental units located at comparison_position around the reference one contains more of a specified chemical, 
+    if it chemical concentration is higher 
+
+    Args:
+      reference_position (tuple): tuple of length 2 containing the x and y coordinates of the reference environmetal unit on the environment grid
+      comparison_position (tuple): tuple of length 2 containing the x and y coordinates of the environmetal unit that is being compared on the environment grid
+
+    Returns:
+      bool: True if the chemical concentration in compared environmental is greater than the reference one 
+    """
+    x_ref, y_ref = reference_position[0], reference_position[1]
+    x_comparison, y_comparison = comparison_position[0], comparison_position[1]
+    return self.environment_grid[x_ref][y_ref] < self.environment_grid[x_comparison][y_comparison]
+
+
+  def printTemperatureMap(self) -> None:
+    pygame.init()
+    temperature_map = pygame.display.set_mode((self.width, self.length))
+
+
+  def printGlucoseMap(self) -> None:
+    pygame.init()
+    glucose_map = pygame.display.set_mode((self.width, self.length))
+
 #############
 # MAIN CODE #
 #############
 if __name__ == "__main__":
-  env = Environment(100,100)
-  blobby = Cell(env,25,30)
-  blobbou = Cell(env,18,17)
+  environment = Environment(100,100)
+  immobile_cell = Cell(environment,25,30)
+  mobile_cell = Cell(environment,18,17)
+
   for i in range(15):
-    print(env)
-    blobby.moving(env)
+    print(environment)
+    mobile_cell.moving(environment, direction=(0,1))
     t.sleep(1)
