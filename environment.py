@@ -4,11 +4,11 @@
 import math
 import numpy as np
 from cell import Cell
-from environment_unit import EnvironmentalUnit
-from environment_grid import EnvironmentGrid
 import time as t
-import physical_data as phy
 import pygame
+from environment_modules.environment_unit import EnvironmentalUnit
+from environment_modules.environment_grid import EnvironmentGrid
+import environment_modules.physical_data as phy
 
 ####################
 # CLASS DEFINITION #
