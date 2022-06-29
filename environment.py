@@ -22,7 +22,7 @@ class Environment:
   environment_grid = []
   
 
-  def __init__(self, length: int, width: int) -> None:
+  def __init__(self, length: int, width: int, initial_temperature: float = 298.15) -> None:
     """Initialize an environment with a length * width size
     Args:
       length (int): length of the environment (length of window in pixel)
@@ -35,7 +35,7 @@ class Environment:
     
     # Create a environment_grid with an EnvironmentalUnit object in each columns and that for each rows
     self.environment_grid: list = [
-      [EnvironmentalUnit(x * EnvironmentalUnit.width, y * EnvironmentalUnit.length)
+      [EnvironmentalUnit(x * EnvironmentalUnit.width, y * EnvironmentalUnit.length, initial_temperature)
       for x in range(self.number_columns)]
       for y in range(self.number_rows)
     ]
@@ -260,10 +260,14 @@ class Environment:
 # MAIN CODE #
 #############
 if __name__ == "__main__":
-  environment = Environment(100,100)
+  environment = Environment(100,100,200)
   immobile_cell = Cell(environment,25,30)
   mobile_cell = Cell(environment,18,17)
+
+  # Display tests
   environment.displayTemperatureMap()
+
+  # Colision tests
   #for i in range(15):
   #  print(environment)
   #  mobile_cell.moving(environment, direction=(0,1))

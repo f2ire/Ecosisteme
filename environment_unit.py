@@ -55,10 +55,12 @@ class EnvironmentalUnit:
     self.rectangle_tuple = (self.x, self.y, self.width, self.length)
 
     self.temperature = temperature
+    self.adaptTemperatureColor()
 
 
   def __str__(self) -> str:
-    return f"Unit at ({self.xlist[0]}, {self.ylist[0]}), having a temperature of:\t{self.temperature} Kelvin"
+    return f"""Unit at ({self.xlist[0]}, {self.ylist[0]}), having a temperature of:\t{self.temperature} Kelvin\n
+  RED: {self.temperature_color[0]}\tGREEN: {self.temperature_color[1]}\tBLUE: {self.temperature_color[2]}"""
 
   
   # OTHER METHODS
@@ -73,14 +75,23 @@ class EnvironmentalUnit:
 
   def adaptTemperatureColor(self) -> None:
     """Modifies the unit's temperature color according to its temperature 
-    Linear interpolation to determine the unit's temperature_color depending on its temperature
-    The color should be blue when the temperature is low, green when it is optimal and red when it's too high
+        The color should be blue when the temperature is low, green when it is optimal and red when it's too high
     """
     
-    self.temperature_color = (255/2*math.erf((self.temperature-350)/50)+125, 255*math.exp(-0.2*(self.temperature-310)**2), 255*math.exp(-self.temperature/130))
-    
+    self.temperature_color = (255/2*math.erf((self.temperature-350)/50)+255/2, # RED
+                              255*math.exp(-1/1000*(self.temperature-320)**2), # GREEN
+                              255*math.exp(-self.temperature/300) # BLUE
+                              )  
     return None
 
 ############
 # MAIN CODE #
 #############
+if __name__ == "__main__":
+  unit1 = EnvironmentalUnit(5,5, temperature=200)
+  
+  print(unit1)
+  
+  
+  # Color computations tests 
+  
