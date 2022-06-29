@@ -17,15 +17,24 @@ class Cell:
   A cell is represented by a small square in the environment
   localized by its (x,y) coordinates
   """
-  # Visual caracteristic
-  width, length = (10,10)
+  width: int = 10
+  length: int = 10
+
+  x: int
+  y: int
+
   birth_color: tuple = (0, 12, 255)
+  color: tuple = birth_color
   death_color: tuple = (0, 0, 0)
-  # Cell parameter
+
+  rectangle_tuple: tuple
+
+
   movement_size: float = 1
-  # The number of times the cell replicates itself in one iteration of the game loop
-  replication_rate: float = 1 / 1000
   
+  replication_rate: float = 1 / 1000 # The number of times the cell replicates itself in one iteration of the game loop
+  
+  age: int = 0
   max_age: int = 6000 # number of time of the game loop the cell is going to survive
 
   x,y = (0,0) 
@@ -37,8 +46,8 @@ class Cell:
 
   def __init__(self, environment, pos_x: int = 0, pos_y: int = 0):
     # The starting position of the cell
-    self.x: int = pos_x
-    self.y: int = pos_y
+    self.x = pos_x
+    self.y = pos_y
     
     # Initialization of the space used by the cell in the environment grid 
     self.occupied_x_coord = np.array([x for x in range(math.floor(self.x), math.floor(self.x) + self.width)])#, EnvironmentalUnit.width)])
@@ -46,9 +55,6 @@ class Cell:
     environment.usedSpace(self.occupied_x_coord, self.occupied_y_coord)
 
     self.rectangle_tuple = (self.x, self.y, self.width, self.length)
-    # When a cell is created, it age is set on 0. The cell is aging over time and it color is changing with it age
-    self.age = 0
-    self.color = Cell.birth_color
 
 
   def __repr__(self) -> str:
@@ -116,7 +122,6 @@ class Cell:
       return False
 
 
-
   def isReplicationPossible(self) -> bool:
     """Takes a random number between 0 and 1 and checks if it is lower than the replication rate of the cell
 
@@ -126,21 +131,23 @@ class Cell:
     return random.random() <= self.replication_rate
 
 
-  def updateCoordinates(self,environment ,movement: tuple) -> None:
-    """
+  def updateCoordinates(self, environment, movement: tuple) -> None:
+    """Adds the coordinates inside the movement tuple to the actual coordinates of the cell.
+    Updates the rectangle_tuple attribute and the occupied lists.
 
     Args:
-        environment (Environment): an object of the instance Environment from the environment.py module
-        movement (tuple): _description_
+      environment (Environment): an object of the instance Environment from the environment.py module
+      movement (tuple): _description_
     """
     self.x = (self.x + movement[0]) % environment.width
     self.y = (self.y + movement[1]) % environment.length
     
     # Updating coordinates on the environmental grid.
-    self.occupied_x_coord = self.occupied_x_coord + movement[0]
-    self.occupied_y_coord = self.occupied_y_coord + movement[1]
+    self.occupied_x_coord += movement[0]
+    self.occupied_y_coord += movement[1]
     
     self.rectangle_tuple = (self.x, self.y, self.length, self.width)
+
 
   def adaptColor(self) -> None:
     """

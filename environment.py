@@ -5,8 +5,9 @@ import math
 import numpy as np
 from cell import Cell
 from environment_unit import EnvironmentalUnit
+from environment_grid import EnvironmentGrid
 import time as t
-import tools.physical_data as constants
+import physical_data as phy
 import pygame
 
 ####################
@@ -16,10 +17,10 @@ class Environment:
   """
   Class stocking multiple environment_unit in a double array. In this class, every function related to 
   """
-  width, length = 0,0
-  number_columns, number_rows = 0,0
+  width: int
+  length: int
 
-  environment_grid = []
+  environment_grid: EnvironmentGrid
   
 
   def __init__(self, length: int, width: int, initial_temperature: float = 298.15) -> None:
@@ -28,38 +29,15 @@ class Environment:
       length (int): length of the environment (length of window in pixel)
       width (int): width of the environment (width of window in pixel)
     """
-    self.length: int = length
-    self.width: int  = width
-    self.number_columns: int = round(self.width / EnvironmentalUnit.width)
-    self.number_rows: int = round(self.length / EnvironmentalUnit.length)
+    self.length = length
+    self.width  = width
     
     # Create a environment_grid with an EnvironmentalUnit object in each columns and that for each rows
-    self.environment_grid: list = [
-      [EnvironmentalUnit(x * EnvironmentalUnit.width, y * EnvironmentalUnit.length, initial_temperature)
-      for x in range(self.number_columns)]
-      for y in range(self.number_rows)
-    ]
+    self.environment_grid = EnvironmentGrid(round(self.width / EnvironmentalUnit.width), round(self.length / EnvironmentalUnit.length))
     return None
   
-  def __str__(self) -> str:
-    index = 0
-    string = f"Evironment dimension ({self.width},{self.length}) \n"
-    # Representing the environment environment_grid with 1 when the 'pixel' is occupied and 0 when it is not.
-    string += "["
-    for n in range(self.number_columns):
-      string += f"{n},"
-    string += " ]\n"
-    for row in self.environment_grid:
-      string += "["
-      for unit in row:
-        if unit.is_occupied:
-          string += "X "
-        else :
-          string += ". "
-      string += f"]{str(index)}\n"
-      index += 1
-    
-    return string
+  def __str__(self) -> str: 
+    return f"Evironment dimension ({self.width},{self.length}) \n"+str(self.environment_grid)
       
   ###########
   # METHODS #
@@ -68,15 +46,13 @@ class Environment:
     """ Sets all the coordinates of the environment environment_grid occupied by the cell on 'occupied' or 'not occupied' depending on the value of delete.
     
     Args:
-      entity :  object of any classes (Cell ...)
       delete (bool): if set to True then the is_occupied parameter of all environmental units is set to False
       xlist (np.array): array containing every coordinates on the environment grid of an entity along the x axis 
       ylist (np.array): array containing every coordinates on the environment grid of an entity along the y axis 
     """
-    #print(math.floor(xlist[0]), math.floor(xlist[-1]), math.floor(ylist[0]), math.floor(ylist[-1]))
     for x in xlist:
       for y in ylist:
-        self.environment_grid[math.floor(x) % self.number_columns][math.floor(y) % self.number_rows].is_occupied = not delete
+        self.environment_grid.getEnvironmentalUnit(math.floor(x) % self.environment_grid.colum_number, math.floor(y) % self.environment_grid.row_number).is_occupied = not delete
     return None
 
 
@@ -159,7 +135,7 @@ class Environment:
     """
     for x in range(starting_x, ending_x):
       for y in range(starting_y, ending_y):
-        if self.environment_grid[x % self.number_columns][y % self.number_rows].is_occupied:
+        if self.environment_grid.getEnvironmentalUnit(x % self.number_columns, y % self.number_rows).is_occupied:
           return False
         else:pass
     return True
@@ -189,7 +165,7 @@ class Environment:
     Returns:
       float: the flux of matter, in kg/m²/s
     """
-    return -constants.density_glucose*constants.computeGlucoseDiffusionCoefficient(temperature)*(concentration1-concentration2)
+    return -phy.density_glucose*phy.computeGlucoseDiffusionCoefficient(temperature)*(concentration1-concentration2)
 
   
   def diffuseTemperature(self) -> None:
@@ -215,7 +191,7 @@ class Environment:
     Returns:
       float: thermal flux, in W/m². Positive if temperature2 > temperature1, negative otherwise.
     """
-    return -constants.thermal_conductivity_water*(temperature1-temperature2)
+    return -phy.thermal_conductivity_water*(temperature1-temperature2)
 
   def displayTemperatureMap(self) -> None:
     """Display the temperature map of the environment using pygame
@@ -254,6 +230,9 @@ if __name__ == "__main__":
   environment = Environment(100,100,200)
   immobile_cell = Cell(environment,25,30)
   mobile_cell = Cell(environment,18,17)
+
+  # Print test
+  print(environment)
 
   # Display tests
   environment.displayTemperatureMap()

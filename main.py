@@ -4,7 +4,7 @@
 import pygame
 from cell import Cell
 import tools.data_logger as data_logger
-from environment import Environment
+from environment_modules.environment import Environment
 
 #############
 # FUNCTIONS #

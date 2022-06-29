@@ -7,45 +7,40 @@ import math
 # CLASS DEFINITION #
 ####################
 class EnvironmentalUnit:
-  """This class provides the smallest element of our environment
-  Object of a square of length x width.
-  This element is capable of welcoming only a single living individuals in it's surface
-  Furthermore, it store environmental parameters such as temperature, pression, height etc.
-  Attribute
-  -------
-  xlist : list
-    List of all int x in the object
-  ylist : list
-    List of all int y in the object
-  -------
+  """This class provides the smallest element of the environment, represented by a small square of width x length.
+  This element stores environmental parameters such as temperature, pression, height and also different chemical concentrations.
+
   """
   
   width: int = 2
   length: int = 2
 
-  x,y = 0,0
+  x: int
+  y: int
+
+
 
   is_occupied: bool = False
   
   volume: float = 1 # m³
-  temperature: float = 0 # in K
-  glucose_concentration: float = 0 # in kg/m³
-  #oxygen_concentration: float = 0 # in kg/m³
-  #nitrogen: float = 0 # in kg/m³
-  #co2: float = 0 # in kg/m³3
+  temperature: float # in K
+  glucose_concentration: float# in kg/m³
+  #oxygen_concentration: float# in kg/m³
+  #nitrogen: float# in kg/m³
+  #co2: float # in kg/m³3
 
-  temperature_color: tuple = (0,0,0) # RGB
+  temperature_color: tuple # RGB
   
-  glucose_color: tuple = (0,0,0) # RGB
+  glucose_color: tuple # RGB
 
   # FONDAMENTAL METHODS
-  def __init__(self, posx: int, posy: int, temperature: float = 298.15):
+  def __init__(self, posx: int, posy: int, temperature: float):
     """
     Unit of a object Environment.
     Args:
       posx (int): positions on x axis
       posy (int): positions on y axis
-      temperature (float) : temperature of the environmental unit, in Kelvin, default equal to 25°C or 298.15 K 
+      temperature (float) : temperature of the environmental unit, in Kelvin
     """
     self.xlist: list = list(range(posx, posx + self.length))
     self.ylist: list = list(range(posy, posy + self.width))
@@ -60,7 +55,7 @@ class EnvironmentalUnit:
 
   def __str__(self) -> str:
     return f"""Unit at ({self.xlist[0]}, {self.ylist[0]}), having a temperature of:\t{self.temperature} Kelvin\n
-  RED: {self.temperature_color[0]}\tGREEN: {self.temperature_color[1]}\tBLUE: {self.temperature_color[2]}"""
+  Color parameters -> RED: {self.temperature_color[0]}\tGREEN: {self.temperature_color[1]}\tBLUE: {self.temperature_color[2]}"""
 
   
   # OTHER METHODS
