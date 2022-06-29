@@ -14,7 +14,7 @@ import pygame
 ####################
 class Environment:
   """
-  Class stocking multiple environment_unit in a double array
+  Class stocking multiple environment_unit in a double array. In this class, every function related to 
   """
   width, length = 0,0
   number_columns, number_rows = 0,0
@@ -64,7 +64,7 @@ class Environment:
   ###########
   # METHODS #
   ###########
-  def usedSpace(self, entity, xlist: np.array, ylist: np.array, delete: bool = False) -> None:
+  def usedSpace(self, xlist: np.array, ylist: np.array, delete: bool = False) -> None:
     """ Sets all the coordinates of the environment environment_grid occupied by the cell on 'occupied' or 'not occupied' depending on the value of delete.
     
     Args:
@@ -105,9 +105,6 @@ class Environment:
 
     xstart, ystart, xend, yend = math.floor(xlist[0]), math.floor(ylist[0]), math.floor(xlist[-1]), math.floor(ylist[-1])
     #print(xstart,xend,xm,";",ystart,yend,ym)
-    # Increments for the for loops because we need only to go from an unit to another
-    #x_i, y_i = EnvironmentalUnit.width, EnvironmentalUnit.length useless for the moment
-  
     
     if xm > 0 and ym == 0:
       return self.areAllUnitsNotOccupied(xend, xend+xm, ystart, yend)
@@ -167,38 +164,22 @@ class Environment:
         else:pass
     return True
   
-  def glucoseDiffusion(self)-> None:
-    """Adjusts the nutrients in every environmental units according to the diffusion rates and the gradient. 
-    The idea is to check if the units in the neighbourhood (upward, downward, right and leftward) contain more glucose and simulate 
-    the creation of a gradient. If the
+  def diffuseGlucose(self)-> None:
+    """Adjusts the glucose concentration in every environmental units.
+    For each environmental unit, 4 flux are calculated, one for each unit directly in contact with it
     """
-    for x in range(self.length,EnvironmentalUnit.length):
-      for y in range(self.width,EnvironmentalUnit.width):
-        if self.isThereMoreNutrientAround((x,y),(x-1,y)):
-          leftward_flux = -self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x-1][y].glucose_concentration)
-        else:
-          leftward_flux = self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x-1][y].glucose_concentration)
-        
-        if self.isThereMoreNutrientAround((x,y),(x+1,y)):
-          rightward_flux = -self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x+1][y].glucose_concentration)
-        else:
-          rightward_flux = self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x+1][y].glucose_concentration)
-        
-        if self.isThereMoreNutrientAround((x,y),(x,y-1)):
-          upward_flux = -self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x][y-1].glucose_concentration)
-        else:
-          upward_flux = self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x][y-1].glucose_concentration)
-        
-        if self.isThereMoreNutrientAround((x,y),(x,y+1)):
-          downward_flux = -self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x][y+1].glucose_concentration)
-        else:
-          downward_flux = self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x][y+1].glucose_concentration)
-
+    for x in range(self.length):
+      for y in range(self.width):
+        leftward_flux = self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x-1][y].glucose_concentration)
+        rightward_flux = self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x+1][y].glucose_concentration)
+        upward_flux = self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x][y-1].glucose_concentration)
+        downward_flux = self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x][y+1].glucose_concentration)
         self.environment_grid[x][y].changeGlucoseConcentration(leftward_flux+rightward_flux+upward_flux+downward_flux)
 
 
   def computeGlucoseFlux(self, temperature: float, concentration1: float, concentration2: float) -> float:
-    """Computes J, the flux of matter of glucose between two environmental units in position 1 (reference) and 2
+    """Computes J, the flux of matter of glucose between two environmental units in position 1 (reference) and 2 
+    according Fick's law of matter diffusion.
 
     Args:
       temperature (float): in Kelvin
@@ -210,21 +191,31 @@ class Environment:
     """
     return -constants.density_glucose*constants.computeGlucoseDiffusionCoefficient(temperature)*(concentration1-concentration2)
 
-  def isThereMoreNutrientsAround(self, reference_position: tuple, comparison_position: tuple) -> bool:
-    """Returns True if the environmental units located at comparison_position around the reference one contains more of a specified chemical, 
-    if it chemical concentration is higher 
+  
+  def diffuseTemperature(self) -> None:
+    """Adjusts the temperature of every environmental units in the enviroment_grid according to Fourier's law of thermal diffusion
+    For each environmental unit, 4 flux are calculated, one for each unit directly in contact with it
+    """
+    for x in range(self.length):
+      for y in range(self.width):
+        lefward_flux = self.computeThermalFlux(self.environment_grid[x][y].temperature, self.environment_grid[x-1][y].temperature)
+        rightward_flux = self.computeThermalFlux(self.environment_grid[x][y].temperature, self.environment_grid[x+1][y].temperature)
+        upward_flux = self.computeThermalFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y-1].temperature)
+        downward_flux = self.computeThermalFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y+1].temperature)
+        self.environment_grid[x][y].changeTemperature(lefward_flux+rightward_flux+upward_flux+downward_flux)
+
+
+  def computeThermalFlux(self, temperature1: float, temperature2: float) -> float:
+    """Computes phi, the thermal transfert from temperature1 to temperature2 in W/m² according to Fourier's law of thermal diffusion
 
     Args:
-      reference_position (tuple): tuple of length 2 containing the x and y coordinates of the reference environmetal unit on the environment grid
-      comparison_position (tuple): tuple of length 2 containing the x and y coordinates of the environmetal unit that is being compared on the environment grid
+      temperature1 (float): temperature, in K
+      temperature2 (float): temperature, in K
 
     Returns:
-      bool: True if the chemical concentration in compared environmental is greater than the reference one 
+      float: thermal flux, in W/m². Positive if temperature2 > temperature1, negative otherwise.
     """
-    x_ref, y_ref = reference_position[0], reference_position[1]
-    x_comparison, y_comparison = comparison_position[0], comparison_position[1]
-    return self.environment_grid[x_ref][y_ref] < self.environment_grid[x_comparison][y_comparison]
-
+    return -constants.thermal_conductivity_water*(temperature1-temperature2)
 
   def displayTemperatureMap(self) -> None:
     """Display the temperature map of the environment using pygame
@@ -252,7 +243,7 @@ class Environment:
         self.environment_grid[x][y].adaptTemperatureColor()
 
 
-  def displayGlucoseMap(self) -> None:
+  def displayGlucoseConcentrationMap(self) -> None:
     pygame.init()
     glucose_map = pygame.display.set_mode((self.width, self.length))
 

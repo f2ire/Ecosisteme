@@ -3,7 +3,7 @@
 
 import pygame
 from cell import Cell
-import data_logger
+import tools.data_logger as data_logger
 from environment import Environment
 
 #############
@@ -31,7 +31,7 @@ world = Environment(window_edge, window_edge) # same dimensions as the window
 # Creating a cell in the middle of our window and initiating it
 first_cell = Cell(world,window_edge // 2, window_edge // 2) ; print(first_cell.occupied_x_coord)
 cells_list = [first_cell]
-world.usedSpace(first_cell, first_cell.occupied_x_coord, first_cell.occupied_y_coord)
+world.usedSpace(first_cell.occupied_x_coord, first_cell.occupied_y_coord)
 main_window.fill(first_cell.color, first_cell.rectangle_tuple)
 
 # For displaying the number of cells over time
@@ -52,7 +52,7 @@ while True:
     for a_cell in cells_list:
       if a_cell.isTooOld():
         # Remove cell object and end loop
-        world.usedSpace(a_cell, a_cell.occupied_x_coord, a_cell.occupied_y_coord, delete=True)
+        world.usedSpace(a_cell.occupied_x_coord, a_cell.occupied_y_coord, delete=True)
         cells_list.remove(a_cell)
         break
       else:

@@ -18,6 +18,7 @@ density_glucose: float = 1.54*10**3 # kg/m³
 
 # Water constants
 density_water: float = 1.0*10**3 # kg/m³
+thermal_conductivity_water = 0.6 # W/m/K
 
 
 ###########

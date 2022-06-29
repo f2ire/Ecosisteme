@@ -43,7 +43,7 @@ class Cell:
     # Initialization of the space used by the cell in the environment grid 
     self.occupied_x_coord = np.array([x for x in range(math.floor(self.x), math.floor(self.x) + self.width)])#, EnvironmentalUnit.width)])
     self.occupied_y_coord = np.array([y for y in range(math.floor(self.y), math.floor(self.y) + self.length)])#, EnvironmentalUnit.length)])
-    environment.usedSpace(self, self.occupied_x_coord, self.occupied_y_coord)
+    environment.usedSpace(self.occupied_x_coord, self.occupied_y_coord)
 
     self.rectangle_tuple = (self.x, self.y, self.width, self.length)
     # When a cell is created, it age is set on 0. The cell is aging over time and it color is changing with it age
@@ -72,7 +72,7 @@ class Cell:
     else:pass
     #print(direction)
 
-    environment.usedSpace(self, self.occupied_x_coord, self.occupied_y_coord, True) # delete the space used by the cell
+    environment.usedSpace(self.occupied_x_coord, self.occupied_y_coord, True) # delete the space used by the cell
     x_movment, y_movement = self.movement_size * direction[0], self.movement_size * direction[1] # Computes the potential coordinates of the cell
 
     is_space_for_moving = environment.isSpace(self.occupied_x_coord, self.occupied_y_coord, (x_movment,y_movement))
@@ -80,7 +80,7 @@ class Cell:
     if is_space_for_moving:
       self.updateCoordinates(environment, (x_movment,y_movement))
     else : pass
-    environment.usedSpace(self, self.occupied_x_coord, self.occupied_y_coord)
+    environment.usedSpace(self.occupied_x_coord, self.occupied_y_coord)
     return None
 
 
@@ -99,7 +99,7 @@ class Cell:
       #print("is_space :",is_space)
       if is_space_for_replication:
         daughter_cell = Cell(environment,self.x + self.width * random_direction[0], self.y + self.length * random_direction[1])
-        environment.usedSpace(daughter_cell, daughter_cell.occupied_x_coord, daughter_cell.occupied_y_coord) # initialise the space occupied by the daughter cell on the environment grid
+        environment.usedSpace(daughter_cell.occupied_x_coord, daughter_cell.occupied_y_coord) # initialise the space occupied by the daughter cell on the environment grid
         cells_list.append(daughter_cell)
       else : pass
     else : pass

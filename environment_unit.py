@@ -73,6 +73,14 @@ class EnvironmentalUnit:
     self.glucose_concentration += glucose_mass/self.volume
 
 
+  def changeTemperature(self, temperature: float) -> None:
+    """Replaces the actual temperature attribute of the environmental unit by the temperature argument
+
+    Args:
+      temperature (float): new temperature of the environmental unit, in Kelvin
+    """
+    self.temperature = temperature
+
   def adaptTemperatureColor(self) -> None:
     """Modifies the unit's temperature color according to its temperature 
         The color should be blue when the temperature is low, green when it is optimal and red when it's too high
