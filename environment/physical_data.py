@@ -70,6 +70,6 @@ def computeThermalFlux(temperature1: float, temperature2: float) -> float:
 #############
 if __name__ == "__main__":
   # Glucose flux computation tests
-  print(computeThermalEnergy(5) == 0.005)
+  print(computeThermalEnergy(5) == 0.005) # OK
   print(computeGlucoseFlux(0.001,0.006)-5.0127 < 10**(-6)) # OK
   print(computeThermalFlux(350,300)== -30) # OK
