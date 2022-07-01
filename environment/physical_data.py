@@ -21,7 +21,7 @@ GLUCOSE_DENSITY: float = 1.54*10**3 # kg/m³
 # Water constants
 WATER_DENSITY: float = 1.0*10**3 # kg/m³
 WATER_THERMAL_CONDUCTIVITY: float = 0.6 # W/m/K
-WATER_HEAT_CAPACITY: int = 4185 # J/K/kg 
+WATER_HEAT_CAPACITY: float = 4.185*10**3 # J/K/kg 
 
 
 ###########
@@ -37,6 +37,18 @@ def computeGlucoseDiffusionCoefficient(temperature: float) -> float:
     float: D, the coefficient of the diffusion of glucose in water solvant, in m²/s
   """
   return GLUCOSE_FREQUENCY_FACTOR*math.exp(-GLUCOSE_ACTIVATION_ENERGY/(temperature*NA*KB))
+
+def computeThermalEnergy(thermal_flux: float) -> float:
+  """Returns Q, the thermal energy according to the formula :
+  Q = Flux * dt where dt is the time of one iteration of the loop
+
+  Args:
+    thermal_flux (float): thermal flux, in W
+
+  Returns:
+    float: Q, the thermal energy, in J
+  """
+  return thermal_flux * TIME_ITERATION
 
 
 #############
