@@ -260,8 +260,10 @@ if __name__ == "__main__":
   temp_grid = TemperatureGrid(4,4,300.047897)
   print(temp_grid) # OK -> possible de faire qqch pour bien aligner les index du haut cependant
 
-  temp_grid.changeMultipleTemperature([0],[0],400)
+  # Changing temperature test
+  temp_grid.changeMultipleTemperature([0],[0],400) # OK
   print(temp_grid)
 
-  temp_grid.makeTemperatureDiffuse()
+  # Diffusing temperature test
+  temp_grid.makeTemperatureDiffuse() # OK 
   print(temp_grid)
