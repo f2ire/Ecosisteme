@@ -14,8 +14,7 @@ KB: float = 1.380649*10**(-23) # Boltzmann constant -> J/mol
 
 
 # Glucose constants
-GLUCOSE_ACTIVATION_ENERGY: float = 1.775*10**4 # Activation energy of the glucose-water diffusion -> J/mol
-GLUCOSE_FREQUENCY_FACTOR: float = 8.380046902993091*10**2 # approximation, assuming it is constant and not dependant on temperature -> m2/s
+GLUCOSE_DIFFUSION_COEFFICIENT: float = 0.651 # taken as constant for T = 298.15 K, in m²/s
 GLUCOSE_DENSITY: float = 1.54*10**3 # kg/m³
 
 # Water constants
@@ -27,17 +26,6 @@ WATER_HEAT_CAPACITY: float = 4.185*10**3 # J/K/kg
 ###########
 # METHODS #
 ###########
-def computeGlucoseDiffusionCoefficient(temperature: float) -> float:
-  """Computes D, the coefficient of the diffusion of glucose in water solvant according to the temperature
-
-  Args:
-    temperature (float): the temperature of the solution of the environment, in Kelvin
-
-  Returns:
-    float: D, the coefficient of the diffusion of glucose in water solvant, in m²/s
-  """
-  return GLUCOSE_FREQUENCY_FACTOR*math.exp(-GLUCOSE_ACTIVATION_ENERGY/(temperature*NA*KB))
-
 def computeThermalEnergy(thermal_flux: float) -> float:
   """Returns Q, the thermal energy according to the formula :
   Q = Flux * dt where dt is the time of one iteration of the loop
@@ -50,12 +38,38 @@ def computeThermalEnergy(thermal_flux: float) -> float:
   """
   return thermal_flux * TIME_ITERATION
 
+def computeGlucoseFlux(concentration1: float, concentration2: float) -> float:
+  """Computes J, the flux of matter of glucose between two environmental units in position 1 (reference) and 2 
+  according to Fick's law of matter diffusion. J = rho*D*(C1-C2) 
+
+  Args:
+    concentration1 (float): molar concentration of the chemical in position 1, by convention the one of reference in kg/L
+    concentration2 (float): molar concentration of the chemical in position 2 in kg/L
+
+  Returns:
+    float: the flux of matter, in kg/m²/s. Positive if concentration2 > concentration1
+  """
+  return -GLUCOSE_DENSITY*GLUCOSE_DIFFUSION_COEFFICIENT*(concentration1-concentration2)
+  
+def computeThermalFlux(temperature1: float, temperature2: float) -> float:
+  """Computes phi, the thermal transfert from temperature1 to temperature2 in W/m² according to 
+  Fourier's law of thermal diffusion
+  
+  Args:
+    temperature1 (float): temperature, in K
+    temperature2 (float): temperature, in K
+  
+  Returns:
+    float: thermal flux, in W. Positive if temperature2 > temperature1, negative otherwise.
+  """
+  return -WATER_THERMAL_CONDUCTIVITY*(temperature1-temperature2)
+
 
 #############
 # MAIN CODE #
 #############
 if __name__ == "__main__":
-  Diffusion_coef = 0.651
-  Temperature = 298.15
-  A = math.exp(-GLUCOSE_ACTIVATION_ENERGY/(NA*KB*Temperature))
-  print(Diffusion_coef/A)
+  # Glucose flux computation tests
+  print(computeThermalEnergy(5) == 0.005)
+  print(computeGlucoseFlux(0.001,0.006)-5.0127 < 10**(-6)) # OK
+  print(computeThermalFlux(350,300)== -30) # OK
