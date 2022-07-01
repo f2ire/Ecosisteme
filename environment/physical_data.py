@@ -52,7 +52,7 @@ def computeGlucoseFlux(concentration1: float, concentration2: float) -> float:
   return -GLUCOSE_DENSITY*GLUCOSE_DIFFUSION_COEFFICIENT*(concentration1-concentration2)
   
 def computeThermalFlux(temperature1: float, temperature2: float) -> float:
-  """Computes phi, the thermal transfert from temperature1 to temperature2 in W/m² according to 
+  """Computes phi, the thermal flux from temperature1 to temperature2 in W/m² according to 
   Fourier's law of thermal diffusion
   
   Args:

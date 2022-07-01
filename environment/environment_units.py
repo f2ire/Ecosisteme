@@ -21,8 +21,6 @@ class EnvironmentUnit:
     surface (float): surface of one unit, in m²
     volume (float): volume of one unit, in m³
     mass (float): total mass of one unit, calculated as it's a cube of water
-    x (int): positional x coordinates of the unit
-    y (int): positional y coordinates of the unit
     is_occupied (bool): True if the occupation unit is occupated by an entity of the environment, False if nothing lays in it
   """
   width: int = 2*10**(-3) # m
@@ -32,16 +30,21 @@ class EnvironmentUnit:
   volume: float =  width * length * height # m³
   mass: float = volume * phy.WATER_DENSITY # kg
 
-  x: int
-  y: int
-
   is_occupied: bool = False
 
-  def __init__(self, posx: int, posy: int) -> None:
-    self.x, self.y = posx, posy
+  def __init__(self) -> None:
+    pass
 
   def __str__(self) -> str:
-    return f"""Unit of shape {self.width} x {self.length}\nAt position ({self.x}, {self.y})\n"""
+    return f"""Unit of shape {self.width} x {self.length}\nis_occupied : {self.is_occupied}\n"""
+
+  def changeOccupationState(self, new_occupation_state: bool) -> None:
+    """Change the is_occupied attribute with the value of new_occupation_state.
+
+    Args:
+      new_occupation_state (bool): True if the unit becomes occupied, False otherwise
+    """
+    self.is_occupied = new_occupation_state
 
 
 class TemperatureUnit(EnvironmentUnit):
@@ -58,18 +61,26 @@ class TemperatureUnit(EnvironmentUnit):
   temperature: float
   color: tuple
 
-  def __init__(self, posx: int, posy: int, initial_temperature: float) -> None:
+  def __init__(self, initial_temperature: float) -> None:
     """
       initial_temperature (float): initial temperature of the unit, in Kelvin
     """
-    super().__init__(posx, posy)
+    super().__init__()
     self.temperature = initial_temperature
     self.adaptTemperatureColor()
 
   def __str__(self) -> str:
     return super().__str__() + f"Having a temperature of : {self.temperature} K\nIts color in RGB encoding is : ({self.color[0]},{self.color[1]},{self.color[2]})\n"
 
-  def changeTemperature(self, thermal_flux: float) -> None:
+  def changeTemperature(self, new_temperature: float) -> None:
+    """Sets the temperature attribute to new_temperature.
+
+    Args:
+      new_temperature (float): temperature to be set, in Kelvin
+    """
+    self.temperature = new_temperature
+
+  def changeTemperatureFromFlux(self, thermal_flux: float) -> None:
     """Update the actual temperature attribute of the temperature unit according to the thermal flux it's receiving.
     Calculus is made following the equation Tf = Ti + Q/(m*c). Tf and Ti are final and initial temperature of the unit.
     m is the total mass of the unit, c it's heat capacity and Q the received thermal energy
@@ -102,11 +113,11 @@ class GlucoseUnit(EnvironmentUnit):
   glucose_concentration: float
   color: tuple
 
-  def __init__(self, posx: int, posy: int, initial_concentration: float) -> None:
+  def __init__(self, initial_concentration: float) -> None:
     """
       initial_concentration (float): initial glucose concentration, in kg/m³
     """
-    super().__init__(posx, posy)
+    super().__init__()
     self.glucose_concentration = initial_concentration
     self.adaptGlucoseColor()
   
@@ -137,9 +148,9 @@ class GlucoseUnit(EnvironmentUnit):
 # MAIN CODE #
 #############
 if __name__ == "__main__":
-  test_occupation_unit = EnvironmentUnit(0,0)
-  test_temperature_unit = TemperatureUnit(1,0,298.15)
-  test_glucose_unit = GlucoseUnit(0,1,0.005)
+  test_occupation_unit = EnvironmentUnit()
+  test_temperature_unit = TemperatureUnit(298.15)
+  test_glucose_unit = GlucoseUnit(0.005)
 
   # Print tests
   print(test_occupation_unit) # OK
@@ -147,5 +158,5 @@ if __name__ == "__main__":
   print(test_glucose_unit) # OK
 
   # Variable change tests
-  test_temperature_unit.changeTemperature(thermal_flux=0.5) ; print(test_temperature_unit.temperature == (5*10**(-4)/(8*10**(-6)*4.185*10**3))+298.15)
-  test_glucose_unit.changeGlucoseConcentration(5*10**(-10)) ; print(test_glucose_unit.glucose_concentration == 0.005+0.5/8)
+  test_temperature_unit.changeTemperatureFromFlux(thermal_flux=0.5) ; print(test_temperature_unit.temperature == (5*10**(-4)/(8*10**(-6)*4.185*10**3))+298.15) # OK
+  test_glucose_unit.changeGlucoseConcentration(5*10**(-10)) ; print(test_glucose_unit.glucose_concentration == 0.005+0.5/8) # OK
