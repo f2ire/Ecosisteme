@@ -2,6 +2,7 @@
 # MODULES #
 ###########
 import math
+import time
 from environment_units import EnvironmentUnit, TemperatureUnit, GlucoseUnit
 import physical_data as phy
 
@@ -172,7 +173,7 @@ class TemperatureGrid:
 
   temperature_units_list: list
 
-  def __init__(self, nbCol: int, nbRows: int, initial_temperature: float) -> None:
+  def __init__(self, nbCol: int, nbRows: int, initial_temperature: float = 298.15) -> None:
     self.column_number, self.row_number = nbCol, nbRows
     self.temperature_units_list = [
       [TemperatureUnit(initial_temperature)for i in range(self.column_number)]
@@ -189,7 +190,7 @@ class TemperatureGrid:
     for row in self.temperature_units_list:
       string += "["
       for unit in row:
-        string += "{:.0f} ".format(unit.temperature)
+        string += f"{unit.temperature:.0f} "
       string += f"]{str(index)}\n"
       index += 1
     
@@ -211,11 +212,11 @@ class TemperatureGrid:
     """Sets the concerned temperature units's temperature on new_temperature.
 
     Args:
-        xlist (np.array): numpy array containing the x coordinates of the temperature units 
-        to be affected by the change of temperature
-        ylist (np.array): numpy array containing the y coordinates of the temperature units 
-        to be affected by the change of temperature
-        new_temperature (float): new temperature to be set in Kelvin
+      xlist (np.array): numpy array containing the x coordinates of the temperature units 
+      to be affected by the change of temperature
+      ylist (np.array): numpy array containing the y coordinates of the temperature units 
+      to be affected by the change of temperature
+      new_temperature (float): new temperature to be set in Kelvin
     """
     for x in xlist:
       for y in ylist:
@@ -231,39 +232,128 @@ class TemperatureGrid:
         upward_flux    = phy.computeThermalFlux(self.getTemperatureUnit(x,y).temperature, self.getTemperatureUnit(x,y-1).temperature)
         downward_flux  = phy.computeThermalFlux(self.getTemperatureUnit(x,y).temperature, self.getTemperatureUnit(x,y+1).temperature)
         self.getTemperatureUnit(x,y).changeTemperatureFromFlux(leftward_flux+rigthward_flux+upward_flux+downward_flux)
+
+
+class GlucoseGrid:
+  column_number: int
+  row_number: int
+
+  glucose_units_list: list
+
+  def __init__(self, nbCol: int, nbRows: int, initial_glucose: float = 0) -> None:
+    self.column_number, self.row_number = nbCol, nbRows
+    self.glucose_units_list = [
+      [GlucoseUnit(initial_glucose)for i in range(self.column_number)]
+    for j in range(self.row_number)]
+
+  def __str__(self) -> str:
+    index = 0
+    string = f"Grid dimensions : ({self.column_number},{self.row_number}) \n"
+    
+    string += "["
+    for n in range(0,self.column_number-1):
+      string += f"{n},"
+    string += f"{self.column_number-1}]\n"
+    for row in self.glucose_units_list:
+      string += "["
+      for unit in row:
+        string += f"{unit.glucose_concentration:.2e} "
+      string += f"]{str(index)}\n"
+      index += 1
+    
+    return string
+
+  def getGlucoseUnit(self, position_x: int, position_y: int) -> GlucoseUnit:
+    """Returns the temperature unit at the specified position
+
+    Args:
+      position_x (int): position along x axis of the wanted temperature unit
+      position_y (int): position along y axis of the wanted temperature unit
+
+    Returns:
+      GlucoseUnit: object of class GlucoseUnit
+    """
+    return self.glucose_units_list[math.floor(position_x) % self.column_number][math.floor(position_y) % self.row_number]
+
+  def changeMultipleGlucoseConcentration(self, xlist, ylist, new_glucose_concentration: float) -> None:
+    """Sets the concerned temperature units's temperature on new_temperature.
+
+    Args:
+      xlist (np.array): numpy array containing the x coordinates of the temperature units 
+      to be affected by the change of glucose concentration
+      ylist (np.array): numpy array containing the y coordinates of the temperature units 
+      to be affected by the change of glucose concentration
+      new_concentration (float): new glucose concentration to be set in Kelvin
+    """
+    for x in xlist:
+      for y in ylist:
+        self.getGlucoseUnit(x,y).changeGlucoseConcentration(new_glucose_concentration)
+
+  def makeGlucoseDiffuse(self) -> None:
+    """Cross every glucose unit in the glucose grid and diffuses the glucose. 
+    For each glucose unit, it computes 4 massic flux, one for each glucose units around it, 
+    and modifies the glucose concentration in the glucose unit in consequence.
+    """
+    for x in range(self.column_number):
+      for y in range(self.row_number):
+        print(f"coor : ({x},{y})")
+        leftward_flux  = phy.computeGlucoseFlux(self.getGlucoseUnit(x,y).glucose_concentration,self.getGlucoseUnit(x-1,y).glucose_concentration)
+        rigthward_flux = phy.computeGlucoseFlux(self.getGlucoseUnit(x,y).glucose_concentration,self.getGlucoseUnit(x+1,y).glucose_concentration)
+        upward_flux    = phy.computeGlucoseFlux(self.getGlucoseUnit(x,y).glucose_concentration,self.getGlucoseUnit(x,y-1).glucose_concentration)
+        downward_flux  = phy.computeGlucoseFlux(self.getGlucoseUnit(x,y).glucose_concentration,self.getGlucoseUnit(x,y+1).glucose_concentration)
+        print(f"Total flux : {leftward_flux+rigthward_flux+upward_flux+downward_flux}")
+        self.getGlucoseUnit(x,y).changeGlucoseConcentrationFromFlux(leftward_flux+rigthward_flux+upward_flux+downward_flux)
     
 ############
 # MAIN CODE #
 #############
 if __name__ == "__main__":
-  environment_grid = EnvironmentGrid(10,10)
+  environment_grid = EnvironmentGrid(3,3)
 
   # Print test
   print(environment_grid) # OK
 
   # Changing is_occupied tests
-  environment_grid.changeMultipleOccupationStates(list(range(4,8)), list(range(4,8)), occupation_state=True)
-  environment_grid.changeMultipleOccupationStates([6], [1], occupation_state=True)
-  environment_grid.changeMultipleOccupationStates([2], [5], occupation_state=True)
-  print(environment_grid) # print test : axes x and y are inverted for the printing of is_occupied
+  #environment_grid.changeMultipleOccupationStates(list(range(4,8)), list(range(4,8)), occupation_state=True)
+  #environment_grid.changeMultipleOccupationStates([1], [1], occupation_state=True)
+  #environment_grid.changeMultipleOccupationStates([2], [2], occupation_state=True)
+  #print(environment_grid) # print test : axes x and y are inverted for the printing of is_occupied
 
   # Occupation tests
-  print(environment_grid.areAllUnitsNotOccupied(0,10,0,10) == False) # OK
-  print(environment_grid.areAllUnitsNotOccupied(3,4,3,4) == True) # OK
-  print(environment_grid.areAllUnitsNotOccupied(4,7,4,7) == False) # OK
+  #print(environment_grid.areAllUnitsNotOccupied(0,10,0,10) == False) # OK
+  #print(environment_grid.areAllUnitsNotOccupied(3,4,3,4) == True) # OK
+  #print(environment_grid.areAllUnitsNotOccupied(4,7,4,7) == False) # OK
 
   # Collision tests
-  print(environment_grid.isSpace(list(range(4,8)), list(range(4,8)), (0,-3)) == False) # OK
-  print(environment_grid.isSpace(list(range(4,8)), list(range(4,8)), (-2,0)) == False) # OK
+  #print(environment_grid.isSpace(list(range(4,8)), list(range(4,8)), (0,-3)) == False) # OK
+  #print(environment_grid.isSpace(list(range(4,8)), list(range(4,8)), (-2,0)) == False) # OK
 
-  # Thermal diffusion tests
-  temp_grid = TemperatureGrid(4,4,300.047897)
-  print(temp_grid) # OK -> possible de faire qqch pour bien aligner les index du haut cependant
+  # Printing TemperatureUnit tests
+  #temp_grid = TemperatureGrid(4,4,300.047897)
+  #print(temp_grid) # OK -> possible de faire qqch pour bien aligner les index du haut cependant
 
   # Changing temperature test
-  temp_grid.changeMultipleTemperature([0],[0],400) # OK
-  print(temp_grid)
+  #temp_grid.changeMultipleTemperature([1,2],[1,2],400) # OK
+  #print(temp_grid)
 
   # Diffusing temperature test
-  temp_grid.makeTemperatureDiffuse() # OK 
-  print(temp_grid)
+  #temp_grid.makeTemperatureDiffuse() # OK 
+  #print(temp_grid)
+
+  # Printing GlucoseUnit test
+  gluc_grid = GlucoseGrid(3,3,5*10**(-3)) # OK
+  print(gluc_grid) # OK
+
+  # Changing glucose concentration test
+  gluc_grid.changeMultipleGlucoseConcentration([1],[1],7*10**(-3))
+  print(gluc_grid) # OK
+
+  # Glucose diffusion test
+  gluc_grid.makeGlucoseDiffuse()
+  print(gluc_grid)
+
+  
+  while gluc_grid.getGlucoseUnit(0,1).glucose_concentration != gluc_grid.getGlucoseUnit(1,1).glucose_concentration:
+    gluc_grid.makeGlucoseDiffuse()
+    print(gluc_grid)
+    

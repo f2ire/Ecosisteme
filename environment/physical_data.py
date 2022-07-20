@@ -6,7 +6,7 @@ import math
 ######################
 # PHYSICAL CONSTANTS #
 ######################
-TIME_ITERATION: int = 10**(-3) # Number of seconds flowing after each iteration of the game loop 
+TIME_ITERATION: int = 10**(0) # Number of seconds flowing after each iteration of the game loop 
 # Universal constants
 NA: float = 6.02214076*10**23 # Avogadero constant -> mol-1
 R: float = 8.31446261815324 # Gas constant -> J/K/mol
@@ -14,8 +14,9 @@ KB: float = 1.380649*10**(-23) # Boltzmann constant -> J/mol
 
 
 # Glucose constants
-GLUCOSE_DIFFUSION_COEFFICIENT: float = 0.651 # taken as constant for T = 298.15 K, in m²/s
+GLUCOSE_DIFFUSION_COEFFICIENT: float = 0.651*10**(-9) # taken as constant for T = 298.15 K, in m²/s
 GLUCOSE_DENSITY: float = 1.54*10**3 # kg/m³
+GLUCOSE_MOLAR_MASS: float = 0.180156 #kg/mol
 
 # Water constants
 WATER_DENSITY: float = 1.0*10**3 # kg/m³
@@ -38,19 +39,6 @@ def computeThermalEnergy(thermal_flux: float) -> float:
   """
   return thermal_flux * TIME_ITERATION
 
-def computeGlucoseFlux(concentration1: float, concentration2: float) -> float:
-  """Computes J, the flux of matter of glucose between two environmental units in position 1 (reference) and 2 
-  according to Fick's law of matter diffusion. J = rho*D*(C1-C2) 
-
-  Args:
-    concentration1 (float): molar concentration of the chemical in position 1, by convention the one of reference in kg/L
-    concentration2 (float): molar concentration of the chemical in position 2 in kg/L
-
-  Returns:
-    float: the flux of matter, in kg/m²/s. Positive if concentration2 > concentration1
-  """
-  return -GLUCOSE_DENSITY*GLUCOSE_DIFFUSION_COEFFICIENT*(concentration1-concentration2)
-  
 def computeThermalFlux(temperature1: float, temperature2: float) -> float:
   """Computes phi, the thermal flux from temperature1 to temperature2 in W/m² according to 
   Fourier's law of thermal diffusion
@@ -62,14 +50,28 @@ def computeThermalFlux(temperature1: float, temperature2: float) -> float:
   Returns:
     float: thermal flux, in W. Positive if temperature2 > temperature1, negative otherwise.
   """
-  return -WATER_THERMAL_CONDUCTIVITY*(temperature1-temperature2)
+  return - WATER_THERMAL_CONDUCTIVITY * (temperature1 - temperature2)
 
+def computeGlucoseFlux(mass_concentration1: float, mass_concentration2: float) -> float:
+  """Computes J, the flux of matter of glucose between two environmental units in position 1 (reference) and 2 
+  according to Fick's law of matter diffusion. J = -D*(C1-C2)
+
+  Args:
+    concentration1 (float): mass concentration of the chemical in position 1, by convention the one of reference in kg/m³
+    concentration2 (float): mass concentration of the chemical in position 2 in kg/m³
+
+  Returns:
+    float: the flux of matter, in kg/m². Positive if concentration2 > concentration1. 
+  """
+  return - GLUCOSE_DIFFUSION_COEFFICIENT * (mass_concentration1 - mass_concentration2) * TIME_ITERATION
 
 #############
 # MAIN CODE #
 #############
 if __name__ == "__main__":
   # Glucose flux computation tests
-  print(computeThermalEnergy(5) == 0.005) # OK
+  print(computeThermalEnergy(5) == 5*TIME_ITERATION) # OK
+  print(computeGlucoseFlux(5,5) == 0) # OK
   print(computeGlucoseFlux(0.001,0.006)-5.0127 < 10**(-6)) # OK
+  print(computeGlucoseFlux(5*10**(-3),7*10**(-3)) == 2*TIME_ITERATION*0.651*10**(-12)) # OK
   print(computeThermalFlux(350,300)== -30) # OK

@@ -70,7 +70,7 @@ class TemperatureUnit(EnvironmentUnit):
     self.adaptTemperatureColor()
 
   def __str__(self) -> str:
-    return super().__str__() + f"Having a temperature of : {self.temperature} K\nIts color in RGB encoding is : ({self.color[0]},{self.color[1]},{self.color[2]})\n"
+    return super().__str__() + f"Having a temperature of : {self.temperature} K\nIts color in RGB encoding is : ({self.color[0]:.2f}, {self.color[1]:.2f}, {self.color[2]:.2f})\n"
 
   def changeTemperature(self, new_temperature: float) -> None:
     """Sets the temperature attribute to new_temperature.
@@ -103,7 +103,7 @@ class GlucoseUnit(EnvironmentUnit):
   """An environmental unit used to store and modify the glucose concentration of the environment.
   
   Attributes :
-    glucose_concentration (float): glucose concetration of the unit, in km/m³
+    glucose_concentration (float): glucose concetration of the unit, in kg/m³
     color (tuple): tuple in RGB format, used to display a glucose map of the environment
   
   Functions : 
@@ -122,16 +122,25 @@ class GlucoseUnit(EnvironmentUnit):
     self.adaptGlucoseColor()
   
   def __str__(self) -> str:
-    return super().__str__() + f"Having a glucose concentration of : {self.glucose_concentration} kg.m⁻³\nIts color in RGB encoding is : ({self.color[0]},{self.color[1]},{self.color[2]})\n"
+    return super().__str__() + f"Having a glucose concentration of : {self.glucose_concentration} kg.m⁻³\nIts color in RGB encoding is : ({self.color[0]:.2f}, {self.color[1]:.2f}, {self.color[2]:.2f})\n"
+
+  def changeGlucoseConcentration(self, new_glucose_concentration: float) -> None:
+    """Replaces the actual glucose concentration of the unit by new_glucose_concentration. 
+
+    Args:
+      new_glucose_concentration (float): concentration of glucose transiting through the unit, in kg/m³.
+    """
+    self.glucose_concentration = new_glucose_concentration
+    self.adaptGlucoseColor()
   
-  def changeGlucoseConcentration(self, glucose_added_mass: float) -> None:
+  def changeGlucoseConcentrationFromFlux(self, glucose_flux: float) -> None:
     """Updates the actual glucose concentration of the unit according to an incoming mass of glucose. 
 
     Args:
-      glucose_added_mass (float): mass of glucose transiting through the unit, in kg. 
+      glucose_flux (float): flux of glucose transiting through the unit, in kg/m². 
         Positive if the unit is receiving glucose, negative if it's losing
     """
-    self.glucose_concentration += glucose_added_mass/self.volume
+    self.glucose_concentration += glucose_flux * self.surface / self.volume
     self.adaptGlucoseColor()
 
   def adaptGlucoseColor(self) -> None:
@@ -151,6 +160,7 @@ if __name__ == "__main__":
   test_occupation_unit = EnvironmentUnit()
   test_temperature_unit = TemperatureUnit(298.15)
   test_glucose_unit = GlucoseUnit(0.005)
+  scd_glucose_unit = GlucoseUnit(7*10**(-3))
 
   # Print tests
   print(test_occupation_unit) # OK
@@ -158,5 +168,8 @@ if __name__ == "__main__":
   print(test_glucose_unit) # OK
 
   # Variable change tests
-  test_temperature_unit.changeTemperatureFromFlux(thermal_flux=0.5) ; print(test_temperature_unit.temperature == (5*10**(-4)/(8*10**(-6)*4.185*10**3))+298.15) # OK
-  test_glucose_unit.changeGlucoseConcentration(5*10**(-10)) ; print(test_glucose_unit.glucose_concentration == 0.005+0.5/8) # OK
+  test_temperature_unit.changeTemperatureFromFlux(thermal_flux=0.5)
+  print(test_temperature_unit.temperature == 298.15 + phy.computeThermalEnergy(0.5)/(phy.WATER_HEAT_CAPACITY*phy.WATER_DENSITY*8*10**(-9))) # OK
+
+  test_glucose_unit.changeGlucoseConcentrationFromFlux(5*10**(-6))
+  print(test_glucose_unit.glucose_concentration == 5*10**(-3) + 5*10**(-6)*4*10**(-6)/(8*10**(-9))) # OK
