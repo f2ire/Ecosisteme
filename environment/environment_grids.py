@@ -2,8 +2,7 @@
 # MODULES #
 ###########
 import math
-import time
-from environment_units import EnvironmentUnit, TemperatureUnit, GlucoseUnit
+from environment_units import * 
 import physical_data as phy
 
 ####################
@@ -16,7 +15,7 @@ class EnvironmentGrid:
   Attributes :
     column_number (int): the number of columns, or environmental units along the x axis.
     row_number (int): the number of rows, or environmental units along the y axis.
-    environment_units_list (list):
+    environment_units_list (list): list containing the environmental units
 
   Functions :
     getEnvironmentUnit
@@ -24,7 +23,6 @@ class EnvironmentGrid:
     changeMultipleOccupationStates
     isSpace
   """
-
   column_number: int
   row_number: int
 
@@ -168,6 +166,14 @@ class EnvironmentGrid:
 
 
 class TemperatureGrid:
+  """This class represents a column_number x row_number grid where an temperature unit is stored at each coordinates.
+  The x axis goes from left to right. The y axis goes from top to bottom.
+
+  Attributes :
+    column_number (int): the number of columns, or environmental units along the x axis.
+    row_number (int): the number of rows, or environmental units along the y axis.
+    temperature_units_list (list): list containing the temperature units
+  """
   column_number: int
   row_number: int
 
@@ -235,6 +241,14 @@ class TemperatureGrid:
 
 
 class GlucoseGrid:
+  """This class represents a column_number x row_number grid where an glucose unit is stored at each coordinates.
+  The x axis goes from left to right. The y axis goes from top to bottom.
+
+  Attributes :
+    column_number (int): the number of columns, or environmental units along the x axis.
+    row_number (int): the number of rows, or environmental units along the y axis.
+    glucose_units_list (list): list containing the glucose units
+  """
   column_number: int
   row_number: int
 
@@ -303,7 +317,7 @@ class GlucoseGrid:
         downward_flux  = phy.computeGlucoseFlux(self.getGlucoseUnit(x,y).glucose_concentration,self.getGlucoseUnit(x,y+1).glucose_concentration)
         print(f"Total flux : {leftward_flux+rigthward_flux+upward_flux+downward_flux}")
         self.getGlucoseUnit(x,y).changeGlucoseConcentrationFromFlux(leftward_flux+rigthward_flux+upward_flux+downward_flux)
-    
+
 ############
 # MAIN CODE #
 #############
@@ -352,8 +366,6 @@ if __name__ == "__main__":
   gluc_grid.makeGlucoseDiffuse()
   print(gluc_grid)
 
-  
   while gluc_grid.getGlucoseUnit(0,1).glucose_concentration != gluc_grid.getGlucoseUnit(1,1).glucose_concentration:
     gluc_grid.makeGlucoseDiffuse()
     print(gluc_grid)
-    
