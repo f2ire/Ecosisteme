@@ -1,244 +1,102 @@
 ###########
 # MODULES #
 ###########
+from environment.environment_grids import *
+from environment.environment_units import *
 import math
-import numpy as np
-from cell import Cell
-import time as t
 import pygame
-from environment_modules.environment_unit import EnvironmentalUnit
-from environment_modules.environment_grid import EnvironmentGrid
-import environment_modules.physical_data as phy
 
 ####################
 # CLASS DEFINITION #
 ####################
-class Environment:
+class World:
   """
-  Class stocking multiple environment_unit in a double array. In this class, every function related to 
+  Class containing all the physical and chemical grids needed to represent a functional environment.
+
+  Attributes:
+    width (float) : size of the width of the world in meters
+    length (float) : size of the length of the world in meters
+    environment_grid (EnvironmentGrid) : object of class EnvironmentGrid
+    temperature_grid (TemperatureGrid) : object of class TemperatureGrid
+    glucose_grid (GlucoseGrid) : object of class GlucoseGrid
   """
-  width: int
-  length: int
+  width: int # m
+  length: int # m
 
   environment_grid: EnvironmentGrid
+  temperature_grid: TemperatureGrid
+  glucose_grid: GlucoseGrid
   
-
-  def __init__(self, length: int, width: int, initial_temperature: float = 298.15) -> None:
-    """Initialize an environment with a length * width size
+  def __init__(self, width: int, length: int, initial_temperature: float = 298.15, initial_glucose: float = 0) -> None:
+    """Initialize an environment with a length x width size
     Args:
-      length (int): length of the environment (length of window in pixel)
-      width (int): width of the environment (width of window in pixel)
+      width (int): width of the environment in meters
+      length (int): length of the environment in meters
+      initial_temperature (float): initial value of temperature of the environment in Kelvin 
+      initial_glucose (float): initial value of glucose concentration in the environment in kg.m⁻³
     """
-    self.length = length
-    self.width  = width
+    self.width, self.length = width, length
     
-    # Create a environment_grid with an EnvironmentalUnit object in each columns and that for each rows
-    self.environment_grid = EnvironmentGrid(round(self.width / EnvironmentalUnit.width), round(self.length / EnvironmentalUnit.length))
-    return None
+    self.environment_grid = EnvironmentGrid(round(self.width / EnvironmentUnit.width), round(self.length / EnvironmentUnit.length))
+    self.temperature_grid = TemperatureGrid(round(self.width / TemperatureUnit.width), round(self.length / TemperatureUnit.length), initial_temperature)
+    self.glucose_grid = GlucoseGrid(round(self.width / GlucoseUnit.width), round(self.length / GlucoseUnit.length), initial_glucose)
   
   def __str__(self) -> str: 
-    return f"Evironment dimension ({self.width},{self.length}) \n"+str(self.environment_grid)
+    string = f"Evironment dimension ({self.width},{self.length}) \n"+str(self.environment_grid)
+    string += str(self.environment_grid)
+    return string
       
   ###########
   # METHODS #
   ###########
-  def usedSpace(self, xlist: np.array, ylist: np.array, delete: bool = False) -> None:
-    """ Sets all the coordinates of the environment environment_grid occupied by the cell on 'occupied' or 'not occupied' depending on the value of delete.
-    
-    Args:
-      delete (bool): if set to True then the is_occupied parameter of all environmental units is set to False
-      xlist (np.array): array containing every coordinates on the environment grid of an entity along the x axis 
-      ylist (np.array): array containing every coordinates on the environment grid of an entity along the y axis 
-    """
-    for x in xlist:
-      for y in ylist:
-        self.environment_grid.getEnvironmentalUnit(math.floor(x) % self.environment_grid.colum_number, math.floor(y) % self.environment_grid.row_number).is_occupied = not delete
-    return None
+  def getWorldScale(self) -> int:
+    return 1 - round(math.log10(self.width))
 
+  def computeWindowSize(self) -> tuple:
+    scale = self.getWorldScale()
+    return (1.2 * self.width * 10**(scale+1), 1.2 * self.length * 10**(scale+1))
 
-  def isSpace(self, xlist: np.array, ylist: np.array, direction: tuple) -> bool:
-    """ Checks if the environment units in a certain direction are available for the entity to move or replicate
-
-    Args:
-      xlist (np.array): array containing every coordinates on the environment environment_grid of an entity along the x axis 
-      ylist (np.array): array containing every coordinates on the environment environment_grid of an entity along the y axis 
-      direction (tuple): tuple of the maximum (absolute value) coordinates where the action will took place. For a cell entity, 
-                         it should either be the values of the movement or the place where the daughter cell gonna appear
-
-    Returns:
-      bool: True if the space is available for the action, False if not
-    """
-    # Maximisation of the movement because it has to be an integer in order to be casted in the environment environment_grid
-    # Multiplication by 2 or else the checking happens only on the surface of the actual entity
-    if direction[0] > 0:
-      xm = 2*math.ceil(direction[0])
-    else:
-      xm = math.floor(2*direction[0])
-    if direction[1] > 0:
-      ym = 2*math.ceil(direction[1])
-    else:
-      ym = math.floor(2*direction[1])
-
-    xstart, ystart, xend, yend = math.floor(xlist[0]), math.floor(ylist[0]), math.floor(xlist[-1]), math.floor(ylist[-1])
-    #print(xstart,xend,xm,";",ystart,yend,ym)
-    
-    if xm > 0 and ym == 0:
-      return self.areAllUnitsNotOccupied(xend, xend+xm, ystart, yend)
-
-    elif xm < 0 and ym == 0:
-      return self.areAllUnitsNotOccupied(xstart+xm, xstart, ystart, yend)
-
-    elif xm == 0 and ym > 0:
-      return self.areAllUnitsNotOccupied(xstart, xend, yend, yend+ym)
-
-    elif xm == 0 and ym < 0:
-      return self.areAllUnitsNotOccupied(xstart, xend, ystart+ym, ystart)
-
-    elif xm > 0 and ym > 0:
-      if self.areAllUnitsNotOccupied(xend, xend+xm, ystart+ym, yend+ ym):
-        if self.areAllUnitsNotOccupied(xstart+xm, xend, yend, yend+ym):
-          return True
-      return False 
-
-    elif xm > 0 and ym < 0:
-      if self.areAllUnitsNotOccupied(xend, xend+xm, ystart+ym, yend+ ym):
-        if self.areAllUnitsNotOccupied(xstart+xm, xend, ystart+ym, ystart):
-          return True
-      return False 
-
-    elif xm < 0 and ym > 0:
-      if self.areAllUnitsNotOccupied(xstart+xm, xstart, ystart+ym, yend+ym):
-        if self.areAllUnitsNotOccupied(xstart, xend+xm, yend, yend+ym):
-          return True
-      return False
-      
-    else:
-      if self.areAllUnitsNotOccupied(xstart+xm, xstart, ystart+ym, yend+ym):
-        if self.areAllUnitsNotOccupied(xstart, xend+xm, ystart+ym, ystart):
-          return True
-      return False
-
-  
-  def areAllUnitsNotOccupied(self, starting_x: int, ending_x: int, starting_y: int, ending_y: int) -> bool:
-    """Navigates in all the environmental units of the environment grid between the starting x and y coordinates and the ending x and y. 
-    For each environmental unit encountered, it checks its is_occupied attribute. If it's set on True, then the function returns False.
-    The function returns True if and only if every environmental units have their is_occuied attribute set on False. 
-
-    Args:
-      starting_x (int): x coordinates of the environment grid where to begin the search 
-      ending_x (int): x coordinates of the environment grid where to end the search
-      starting_y (int): y coordinates of the environment grid where to begin the search 
-      ending_y (int): y coordinates of the environment grid where to end the search
-
-    Returns:
-      bool: True if every environmental units have their is_occuied attribute set on False, False otherwise.
-    """
-    for x in range(starting_x, ending_x):
-      for y in range(starting_y, ending_y):
-        if self.environment_grid.getEnvironmentalUnit(x % self.number_columns, y % self.number_rows).is_occupied:
-          return False
-        else:pass
-    return True
-  
-  def diffuseGlucose(self)-> None:
-    """Adjusts the glucose concentration in every environmental units.
-    For each environmental unit, 4 flux are calculated, one for each unit directly in contact with it
-    """
-    for x in range(self.length):
-      for y in range(self.width):
-        leftward_flux = self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x-1][y].glucose_concentration)
-        rightward_flux = self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x+1][y].glucose_concentration)
-        upward_flux = self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x][y-1].glucose_concentration)
-        downward_flux = self.computeGlucoseFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y].glucose_concentration, self.environment_grid[x][y+1].glucose_concentration)
-        self.environment_grid[x][y].changeGlucoseConcentration(leftward_flux+rightward_flux+upward_flux+downward_flux)
-
-
-  def computeGlucoseFlux(self, temperature: float, concentration1: float, concentration2: float) -> float:
-    """Computes J, the flux of matter of glucose between two environmental units in position 1 (reference) and 2 
-    according Fick's law of matter diffusion.
-
-    Args:
-      temperature (float): in Kelvin
-      concentration1 (float): molar concentration of the chemical in position 1, by convention the one of reference in kg/L
-      concentration2 (float): molar concentration of the chemical in position 2 in kg/L
-
-    Returns:
-      float: the flux of matter, in kg/m²/s
-    """
-    return -phy.density_glucose*phy.computeGlucoseDiffusionCoefficient(temperature)*(concentration1-concentration2)
-
-  
-  def diffuseTemperature(self) -> None:
-    """Adjusts the temperature of every environmental units in the enviroment_grid according to Fourier's law of thermal diffusion
-    For each environmental unit, 4 flux are calculated, one for each unit directly in contact with it
-    """
-    for x in range(self.length):
-      for y in range(self.width):
-        lefward_flux = self.computeThermalFlux(self.environment_grid[x][y].temperature, self.environment_grid[x-1][y].temperature)
-        rightward_flux = self.computeThermalFlux(self.environment_grid[x][y].temperature, self.environment_grid[x+1][y].temperature)
-        upward_flux = self.computeThermalFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y-1].temperature)
-        downward_flux = self.computeThermalFlux(self.environment_grid[x][y].temperature, self.environment_grid[x][y+1].temperature)
-        self.environment_grid[x][y].changeTemperature(lefward_flux+rightward_flux+upward_flux+downward_flux)
-
-
-  def computeThermalFlux(self, temperature1: float, temperature2: float) -> float:
-    """Computes phi, the thermal transfert from temperature1 to temperature2 in W/m² according to Fourier's law of thermal diffusion
-
-    Args:
-      temperature1 (float): temperature, in K
-      temperature2 (float): temperature, in K
-
-    Returns:
-      float: thermal flux, in W/m². Positive if temperature2 > temperature1, negative otherwise.
-    """
-    return -phy.thermal_conductivity_water*(temperature1-temperature2)
+  def createUnitDisplayRectangle(self, x_position: int, y_position: int) -> tuple:
+    scale = self.getWorldScale()
+    return (x_position, y_position, EnvironmentUnit.width * 10**(scale + 1), EnvironmentUnit.length * 10**(scale + 1))
 
   def displayTemperatureMap(self) -> None:
     """Display the temperature map of the environment using pygame
     """
     pygame.init()
-    temperature_map = pygame.display.set_mode((self.width+10, self.length+10))
-    self.computeAllTemperatureColors()
+    window_dimension = self.computeWindowSize()
+    temperature_map = pygame.display.set_mode(window_dimension)
+    self.temperature_grid.computeAllTemperatureColors()
     while True:
       event = pygame.event.poll()  # Collecting an event from the user
       if event.type == pygame.QUIT:  # End loop if user click on cross butun
         break
 
-      for x in range(self.number_columns):
-        for y in range(self.number_rows):
-          temperature_map.fill(self.environment_grid[x][y].temperature_color, self.environment_grid[x][y].rectangle_tuple)
-          pygame.display.flip()
+      x,y = 20,20
+      for row in self.temperature_grid.temperature_units_list:
+        for temp_unit in row:
+          temp_unit: TemperatureUnit
+          temp_unit_display_rectangle = self.createUnitDisplayRectangle(x,y)
+          temperature_map.fill(temp_unit.color, temp_unit_display_rectangle)
+          x += temp_unit_display_rectangle[2]
+        x = 20
+        y += temp_unit_display_rectangle[3]
+      pygame.display.flip()
     pygame.quit()
 
-
-  def computeAllTemperatureColors(self) -> None:
-    """For each environmtal units in the environment grid, computes its temperature_color with the adaptTemperatureColor function 
-    """
-    for x in range(self.number_columns):
-      for y in range(self.number_rows):
-        self.environment_grid[x][y].adaptTemperatureColor()
-
-
-  def displayGlucoseConcentrationMap(self) -> None:
-    pygame.init()
-    glucose_map = pygame.display.set_mode((self.width, self.length))
+  #def displayGlucoseConcentrationMap(self) -> None:
+  #  pygame.init()
+  #  glucose_map = pygame.display.set_mode((self.width, self.length))
+  #  pygame.quit()
 
 #############
 # MAIN CODE #
 #############
 if __name__ == "__main__":
-  environment = Environment(100,100,200)
-  immobile_cell = Cell(environment,25,30)
-  mobile_cell = Cell(environment,18,17)
-
-  # Print test
-  print(environment)
-
-  # Display tests
-  environment.displayTemperatureMap()
-
-  # Colision tests
-  #for i in range(15):
-  #  print(environment)
-  #  mobile_cell.moving(environment, direction=(0,1))
-  #  t.sleep(1)
+  the_world = World(20*10**(-3),20*10**(-3))
+  print(the_world) # OK
+  print(the_world.getWorldScale() == 3) # OK
+  print(the_world.computeWindowSize() == (240,240)) # OK
+  print(the_world.createUnitDisplayRectangle(5,3) == (5,3,2*10**(4-3),2*10**(4-3))) # OK
+  the_world.temperature_grid.changeMultipleTemperature([3,4,5,6],[3,4,5,6],2000) # OK
+  the_world.displayTemperatureMap()
