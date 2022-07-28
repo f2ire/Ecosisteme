@@ -388,9 +388,9 @@ if __name__ == "__main__":
   print(gluc_grid) # OK
 
   # Computing every color adapation test
-  gluc_grid.computeAllGlucoseColor()
-  print(gluc_grid.getGlucoseUnit(1,1))
-  
+  gluc_grid.computeAllGlucoseColor() # OK
+  print(gluc_grid.getGlucoseUnit(1,1)) 
+
   ## Glucose diffusion test
   #gluc_grid.makeGlucoseDiffuse()
   #print(gluc_grid)
