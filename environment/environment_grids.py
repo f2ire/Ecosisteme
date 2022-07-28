@@ -214,6 +214,14 @@ class TemperatureGrid:
     """
     return self.temperature_units_list[math.floor(position_x) % self.column_number][math.floor(position_y) % self.row_number]
 
+  def computeAllTemperatureColors(self) -> None:
+    """Adapt the color of every temperature units in the grid using their adaptTemperatureColor function
+    """
+    for row in self.temperature_units_list:
+      for unit in row:
+        unit:TemperatureUnit
+        unit.adaptTemperatureColor()
+
   def changeMultipleTemperature(self, xlist, ylist, new_temperature: float) -> None:
     """Sets the concerned temperature units's temperature on new_temperature.
 
@@ -302,6 +310,14 @@ class GlucoseGrid:
     for x in xlist:
       for y in ylist:
         self.getGlucoseUnit(x,y).changeGlucoseConcentration(new_glucose_concentration)
+  
+  def computeAllGlucoseColor(self) -> None:
+    """Adapt the color of every glucose units in the grid using their adaptGlucoseColor function
+    """
+    for row in self.glucose_units_list:
+      for glu_unit in row:
+        glu_unit:GlucoseUnit
+        glu_unit.adaptGlucoseColor()
 
   def makeGlucoseDiffuse(self) -> None:
     """Cross every glucose unit in the glucose grid and diffuses the glucose. 
@@ -325,7 +341,7 @@ if __name__ == "__main__":
   environment_grid = EnvironmentGrid(3,3)
 
   # Print test
-  print(environment_grid) # OK
+  #print(environment_grid) # OK
 
   # Changing is_occupied tests
   #environment_grid.changeMultipleOccupationStates(list(range(4,8)), list(range(4,8)), occupation_state=True)
@@ -342,14 +358,22 @@ if __name__ == "__main__":
   #print(environment_grid.isSpace(list(range(4,8)), list(range(4,8)), (0,-3)) == False) # OK
   #print(environment_grid.isSpace(list(range(4,8)), list(range(4,8)), (-2,0)) == False) # OK
 
-  # Printing TemperatureUnit tests
-  #temp_grid = TemperatureGrid(4,4,300.047897)
-  #print(temp_grid) # OK -> possible de faire qqch pour bien aligner les index du haut cependant
+  # Printing TemperatureGrid test
+  temp_grid = TemperatureGrid(4,4,300.047897)
+  print(temp_grid) # OK -> possible de faire qqch pour bien aligner les index du haut cependant
 
   # Changing temperature test
-  #temp_grid.changeMultipleTemperature([1,2],[1,2],400) # OK
-  #print(temp_grid)
+  print(temp_grid.getTemperatureUnit(1,1))
+  temp_grid.changeMultipleTemperature([1,2],[1,2],400) # OK
+  print(temp_grid)
 
+  # Computing every temperature colors test
+  temp_grid.computeAllTemperatureColors()
+  print(temp_grid.getTemperatureUnit(1,1))
+  print(temp_grid.getTemperatureUnit(1,2))
+  print(temp_grid.getTemperatureUnit(2,1))
+  print(temp_grid.getTemperatureUnit(2,2)) # OK
+  
   # Diffusing temperature test
   #temp_grid.makeTemperatureDiffuse() # OK 
   #print(temp_grid)
@@ -359,13 +383,18 @@ if __name__ == "__main__":
   print(gluc_grid) # OK
 
   # Changing glucose concentration test
+  print(gluc_grid.getGlucoseUnit(1,1))
   gluc_grid.changeMultipleGlucoseConcentration([1],[1],7*10**(-3))
   print(gluc_grid) # OK
 
-  # Glucose diffusion test
-  gluc_grid.makeGlucoseDiffuse()
-  print(gluc_grid)
+  # Computing every color adapation test
+  gluc_grid.computeAllGlucoseColor()
+  print(gluc_grid.getGlucoseUnit(1,1))
+  
+  ## Glucose diffusion test
+  #gluc_grid.makeGlucoseDiffuse()
+  #print(gluc_grid)
 
-  while gluc_grid.getGlucoseUnit(0,1).glucose_concentration != gluc_grid.getGlucoseUnit(1,1).glucose_concentration:
-    gluc_grid.makeGlucoseDiffuse()
-    print(gluc_grid)
+  #while gluc_grid.getGlucoseUnit(0,1).glucose_concentration != gluc_grid.getGlucoseUnit(1,1).glucose_concentration:
+  #  gluc_grid.makeGlucoseDiffuse()
+  #  print(gluc_grid) # OK

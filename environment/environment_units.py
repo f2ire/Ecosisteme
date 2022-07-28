@@ -170,6 +170,8 @@ if __name__ == "__main__":
   # Variable change tests
   test_temperature_unit.changeTemperatureFromFlux(thermal_flux=0.5)
   print(test_temperature_unit.temperature == 298.15 + phy.computeThermalEnergy(0.5)/(phy.WATER_HEAT_CAPACITY*phy.WATER_DENSITY*8*10**(-9))) # OK
+  # Color adaptation test
+  test_temperature_unit.adaptTemperatureColor() ; print(test_temperature_unit) # OK
 
   test_glucose_unit.changeGlucoseConcentrationFromFlux(5*10**(-6))
   print(test_glucose_unit.glucose_concentration == 5*10**(-3) + 5*10**(-6)*4*10**(-6)/(8*10**(-9))) # OK
