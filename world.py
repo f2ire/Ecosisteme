@@ -50,15 +50,15 @@ class World:
   # METHODS #
   ###########
   def getWorldScale(self) -> int:
-    return 1 - round(math.log10(self.width))
+    return round(math.log10(self.width))
 
   def computeWindowSize(self) -> tuple:
-    scale = self.getWorldScale()
-    return (1.2 * self.width * 10**(scale+1), 1.2 * self.length * 10**(scale+1))
+    scale = -self.getWorldScale()
+    return (1.2 * self.width * 10**(scale + 2), 1.2 * self.length * 10**(scale + 2))
 
   def createUnitDisplayRectangle(self, x_position: int, y_position: int) -> tuple:
-    scale = self.getWorldScale()
-    return (x_position, y_position, EnvironmentUnit.width * 10**(scale + 1), EnvironmentUnit.length * 10**(scale + 1))
+    scale = -self.getWorldScale()
+    return (x_position, y_position, EnvironmentUnit.width * 10**(scale + 2), EnvironmentUnit.length * 10**(scale + 2))
 
   def displayTemperatureMap(self) -> None:
     """Display the temperature map of the environment using pygame
@@ -84,19 +84,38 @@ class World:
       pygame.display.flip()
     pygame.quit()
 
-  #def displayGlucoseConcentrationMap(self) -> None:
-  #  pygame.init()
-  #  glucose_map = pygame.display.set_mode((self.width, self.length))
-  #  pygame.quit()
+  def displayGlucoseConcentrationMap(self) -> None:
+    pygame.init()
+    window_dimension = self.computeWindowSize()
+    glucose_map = pygame.display.set_mode(window_dimension)
+    self.glucose_grid.computeAllGlucoseColor()
+    while True:
+      event = pygame.event.poll()  # Collecting an event from the user
+      if event.type == pygame.QUIT:  # End loop if user click on cross butun
+        break
+
+      x,y = 20,20
+      for row in self.glucose_grid.glucose_units_list:
+        for glucose_unit in row:
+          glucose_unit: TemperatureUnit
+          glucose_unit_display_rectangle = self.createUnitDisplayRectangle(x,y)
+          glucose_map.fill(glucose_unit.color, glucose_unit_display_rectangle)
+          x += glucose_unit_display_rectangle[2]
+        x = 20
+        y += glucose_unit_display_rectangle[3]
+      pygame.display.flip()
+    pygame.quit()
 
 #############
 # MAIN CODE #
 #############
 if __name__ == "__main__":
-  the_world = World(20*10**(-3),20*10**(-3))
+  the_world = World(0.02,0.02)
   print(the_world) # OK
-  print(the_world.getWorldScale() == 3) # OK
+  print(the_world.getWorldScale() == -2) # OK
   print(the_world.computeWindowSize() == (240,240)) # OK
   print(the_world.createUnitDisplayRectangle(5,3) == (5,3,2*10**(4-3),2*10**(4-3))) # OK
-  the_world.temperature_grid.changeMultipleTemperature([3,4,5,6],[3,4,5,6],2000) # OK
-  the_world.displayTemperatureMap()
+  the_world.temperature_grid.changeMultipleTemperature([3,4,5,6],[3,4,5,6],2000)
+  #the_world.displayTemperatureMap() # OK
+  the_world.glucose_grid.changeMultipleGlucoseConcentration([3,4,5,6],[3,4,5,6],0.004)
+  the_world.displayGlucoseConcentrationMap() # OK
