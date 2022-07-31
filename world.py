@@ -37,9 +37,9 @@ class World:
     """
     self.width, self.length = width, length
     
-    self.environment_grid = EnvironmentGrid(round(self.width / EnvironmentUnit.width), round(self.length / EnvironmentUnit.length))
-    self.temperature_grid = TemperatureGrid(round(self.width / TemperatureUnit.width), round(self.length / TemperatureUnit.length), initial_temperature)
-    self.glucose_grid = GlucoseGrid(round(self.width / GlucoseUnit.width), round(self.length / GlucoseUnit.length), initial_glucose)
+    self.environment_grid = EnvironmentGrid(self.width, self.length )
+    self.temperature_grid = TemperatureGrid(self.width, self.length , initial_temperature)
+    self.glucose_grid = GlucoseGrid(self.width, self.length , initial_glucose)
   
   def __str__(self) -> str: 
     string = f"Evironment dimension ({self.width},{self.length}) \n"+str(self.environment_grid)
@@ -54,11 +54,11 @@ class World:
 
   def computeWindowSize(self) -> tuple:
     scale = -self.getWorldScale()
-    return (1.2 * self.width * 10**(scale + 2), 1.2 * self.length * 10**(scale + 2))
+    return (2.4 * self.width * 10**(scale + 2), 2.4 * self.length * 10**(scale + 2))
 
   def createUnitDisplayRectangle(self, x_position: int, y_position: int) -> tuple:
     scale = -self.getWorldScale()
-    return (x_position, y_position, EnvironmentUnit.width * 10**(scale + 2), EnvironmentUnit.length * 10**(scale + 2))
+    return (x_position, y_position, EnvironmentUnit.width * 10**(scale + 2.3), EnvironmentUnit.length * 10**(scale + 2.3))
 
   def displayTemperatureMap(self) -> None:
     """Display the temperature map of the environment using pygame
@@ -110,12 +110,12 @@ class World:
 # MAIN CODE #
 #############
 if __name__ == "__main__":
-  the_world = World(0.02,0.02)
+  the_world = World(10**(-5), 10**(-5)) # 40 x 40 units
   print(the_world) # OK
-  print(the_world.getWorldScale() == -2) # OK
+  print(the_world.getWorldScale() == -5) # OK
   print(the_world.computeWindowSize() == (240,240)) # OK
-  print(the_world.createUnitDisplayRectangle(5,3) == (5,3,2*10**(4-3),2*10**(4-3))) # OK
+  print(the_world.createUnitDisplayRectangle(5,3) == (5,3,25*10**(-0.7),25*10**(-0.7))) # OK
   the_world.temperature_grid.changeMultipleTemperature([3,4,5,6],[3,4,5,6],2000)
-  #the_world.displayTemperatureMap() # OK
+  the_world.displayTemperatureMap() # OK
   the_world.glucose_grid.changeMultipleGlucoseConcentration([3,4,5,6],[3,4,5,6],0.004)
-  the_world.displayGlucoseConcentrationMap() # OK
+  #the_world.displayGlucoseConcentrationMap() # OK

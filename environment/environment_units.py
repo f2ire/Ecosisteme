@@ -23,9 +23,9 @@ class EnvironmentUnit:
     mass (float): total mass of one unit, calculated as it's a cube of water
     is_occupied (bool): True if the occupation unit is occupated by an entity of the environment, False if nothing lays in it
   """
-  width: int = 2*10**(-3) # m
-  length: int = 2*10**(-3) # m 
-  height: int = 2*10**(-3) # m
+  width: int  = 25*10**(-8) # m
+  length: int = 25*10**(-8) # m 
+  height: int = 25*10**(-8) # m
   surface: float = width * length # m²
   volume: float =  width * length * height # m³
   mass: float = volume * phy.WATER_DENSITY # kg

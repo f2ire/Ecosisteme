@@ -1,12 +1,12 @@
 ###########
 # MODULES #
 ###########
-import math
+
 
 ######################
 # PHYSICAL CONSTANTS #
 ######################
-TIME_ITERATION: int = 10**(0) # Number of seconds flowing after each iteration of the game loop 
+TIME_ITERATION: int = 10**(-1) # Number of seconds flowing after each iteration of the game loop 
 # Universal constants
 NA: float = 6.02214076*10**23 # Avogadero constant -> mol-1
 R: float = 8.31446261815324 # Gas constant -> J/K/mol

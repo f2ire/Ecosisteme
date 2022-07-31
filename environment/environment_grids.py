@@ -15,6 +15,8 @@ class EnvironmentGrid:
   Attributes :
     column_number (int): the number of columns, or environmental units along the x axis.
     row_number (int): the number of rows, or environmental units along the y axis.
+    width (float): width of the environment grid, in meters
+    length (float): length of the environment grid, in meters
     environment_units_list (list): list containing the environmental units
 
   Functions :
@@ -26,17 +28,22 @@ class EnvironmentGrid:
   column_number: int
   row_number: int
 
+  width: float
+  length: float
+
   environment_units_list: list
 
-  def __init__(self, col_nb: int, row_nb: int) -> None:
-    self.column_number, self.row_number = col_nb, row_nb
+  def __init__(self, wdth: float, lgth: float) -> None:
+    self.width, self.length = wdth, lgth
+    self.column_number = round(self.width / EnvironmentUnit.width)
+    self.row_number = round(self.length / EnvironmentUnit.length)
 
     self.environment_units_list = [
       [EnvironmentUnit() for i in range(self.column_number)] for j in range(self.row_number)] 
 
   def __str__(self) -> str:
     index = 0
-    string = f"Grid dimensions : ({self.column_number},{self.row_number}) \n"
+    string = f"Environment grid dimensions : {self.width}m x {self.length}m\n"
     # Representing the environment grid with an X when the environmental unit is occupied and with . when it is not.
     string += "["
     for n in range(0,self.column_number-1):
@@ -79,6 +86,9 @@ class EnvironmentGrid:
     for x in xlist:
       for y in ylist:
         self.getEnvironmentUnit(x, y).changeOccupationState(occupation_state)
+  
+  def convertCoordinates(self):
+    pass
 
   def areAllUnitsNotOccupied(self, starting_x: int, ending_x: int, starting_y: int, ending_y: int) -> bool:
     """Navigates through all the environmental units of the environment grid between the starting x and y coordinates 
@@ -172,22 +182,30 @@ class TemperatureGrid:
   Attributes :
     column_number (int): the number of columns, or environmental units along the x axis.
     row_number (int): the number of rows, or environmental units along the y axis.
+    width (float): width of the environment grid, in meters
+    length (float): length of the environment grid, in meters
     temperature_units_list (list): list containing the temperature units
   """
   column_number: int
   row_number: int
 
+  width: float
+  length: float
+
   temperature_units_list: list
 
-  def __init__(self, nbCol: int, nbRows: int, initial_temperature: float = 298.15) -> None:
-    self.column_number, self.row_number = nbCol, nbRows
+  def __init__(self, wdth: float, lgth: float, initial_temperature: float = 298.15) -> None:
+    self.width, self.length = wdth, lgth
+    self.column_number = round(self.width / EnvironmentUnit.width)
+    self.row_number = round(self.length / EnvironmentUnit.length)
+
     self.temperature_units_list = [
       [TemperatureUnit(initial_temperature)for i in range(self.column_number)]
     for j in range(self.row_number)]
 
   def __str__(self) -> str:
     index = 0
-    string = f"Grid dimensions : ({self.column_number},{self.row_number}) \n"
+    string = f"Temperature grid dimensions : {self.width}m x {self.length}m\n"
     
     string += "["
     for n in range(0,self.column_number-1):
@@ -255,23 +273,29 @@ class GlucoseGrid:
   Attributes :
     column_number (int): the number of columns, or environmental units along the x axis.
     row_number (int): the number of rows, or environmental units along the y axis.
+    width (float): width of the environment grid, in meters
+    length (float): length of the environment grid, in meters
     glucose_units_list (list): list containing the glucose units
   """
   column_number: int
   row_number: int
 
+  width: float
+  length: float
+
   glucose_units_list: list
 
-  def __init__(self, nbCol: int, nbRows: int, initial_glucose: float = 0) -> None:
-    self.column_number, self.row_number = nbCol, nbRows
+  def __init__(self, wdth: float, lgth: float, initial_glucose: float = 0) -> None:
+    self.width, self.length = wdth, lgth
+    self.column_number = round(self.width / EnvironmentUnit.width)
+    self.row_number = round(self.length / EnvironmentUnit.length)
     self.glucose_units_list = [
       [GlucoseUnit(initial_glucose)for i in range(self.column_number)]
     for j in range(self.row_number)]
 
   def __str__(self) -> str:
     index = 0
-    string = f"Grid dimensions : ({self.column_number},{self.row_number}) \n"
-    
+    string = f"Glucose grid dimensions : {self.width}m x {self.length}m\n"
     string += "["
     for n in range(0,self.column_number-1):
       string += f"{n},"
