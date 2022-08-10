@@ -10,8 +10,7 @@ import pygame
 # CLASS DEFINITION #
 ####################
 class World:
-  """
-  Class containing all the physical and chemical grids needed to represent a functional environment.
+  """Class containing all the physical and chemical grids needed to represent a functional environment.
 
   Attributes:
     width (float) : size of the width of the world in meters

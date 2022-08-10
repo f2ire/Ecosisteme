@@ -13,12 +13,32 @@ import environment.physical_data as phy
 # CLASS DEFINITION #
 ####################
 class Cell:
-  """
-  Cell object is the fondamental unit of life
-  Cells should be capable of moving towards energy&food sources
-  and replicate itself. It has some basic attributes
-  A cell is represented by a small square in the environment
-  localized by its (x,y) coordinates
+  """Class reprensenting a cellular individual as a colored cube, capable of movement and replication.
+  The cell's color is changing along with its age.
+  
+  Attributes:
+  width (float) : size of the width of the cell in meters
+  length (float): size of the length of the cell in meters
+  height (float): size of the heigth of the cell in meters
+  surface (float): surface of one face of the cell in m²
+  volume (float) : volume of the cell in m³
+  nb_unit_width (int) : total number of environment units contained in the width of the cell
+  nb_unit_length (int): total number of environment units contained in the length of the cell
+  x (int): coordinates along the x axis of the cell
+  y (int): coordinates along the y axis of the cell
+  birth_color (tuple): RGB tuple of the starting color of the cell, when the cell's age is 0
+  color (tuple): actual RBG tuple of the cell's color
+  death_color (tuple): RGB tuple the cell is closing by when it's aging
+  display_width (int): size of the width of the cell in the pygame window in pixels 
+  display_length (int) : size of the length of the cell in the pygame window in pixels 
+  display_tuple (tuple): contains the information for a cell to be displayed on a pygame window, 
+    in this format ; (x, y, display_width, display_length)
+  speed (float): speed of the cell in meters by seconds
+  replication_rate (float): probability of the cell to replicate in one iteration of the game loop
+  age (int): actual age of the cell or the number of loops it has been living
+  max_age (int): maximal age the cell can be
+  occupied_x_coord (np.array): contains every coordinates along the x axis of the environmental units occupied by the cell  
+  occupied_y_coord (np.array): contains every coordinates along the y axis of the environmental units occupied by the cell 
   """
   width: float = 1 * 10**(-6) # m
   length: float = 1 * 10**(-6) # m
@@ -36,16 +56,16 @@ class Cell:
   color: tuple = birth_color
   death_color: tuple = (0, 0, 0)
 
-  display_widt: int  = 20 # pixels
+  display_width : int  = 20 # pixels
   display_length: int = 20 # pixels
-  display_tuple : tuple
+  display_tuple: tuple
 
   speed: float = 10**(-5) # m/s
   
-  replication_rate: float = 1 / 1000 # The number of times the cell replicates itself in one iteration of the game loop
+  replication_rate: float = 1 / 1000
   
   age: int = 0
-  max_age: int = 6000 # number of time of the game loop the cell is going to survive
+  max_age: int = 6000
   
   # Square in the Environment grid used by the cell -> using np to fasten the computations
   occupied_x_coord: np.array = np.empty(shape=(nb_unit_width, nb_unit_length))
@@ -57,14 +77,16 @@ class Cell:
     self.y = pos_y
     
     # Initialization of the space used by the cell in the environment grid 
-    self.occupied_x_coord = np.array([x for x in range(math.floor(self.x), math.floor(self.x) + self.nb_unit_width)])#, EnvironmentalUnit.width)])
-    self.occupied_y_coord = np.array([y for y in range(math.floor(self.y), math.floor(self.y) + self.nb_unit_length)])#, EnvironmentalUnit.length)])
+    self.occupied_x_coord = np.array([x for x in range(math.floor(self.x), math.floor(self.x) + self.nb_unit_width)])
+    self.occupied_y_coord = np.array([y for y in range(math.floor(self.y), math.floor(self.y) + self.nb_unit_length)])
     environment.changeMultipleOccupationStates(self.occupied_x_coord, self.occupied_y_coord, True)
 
     self.display_tuple = (self.x, self.y, self.display_width, self.display_length)
 
   def __repr__(self) -> str:
-    return f"Cell at ({self.x}, {self.y})"
+    string = f"Cell at ({self.x}, {self.y})\n"
+    string += f"Its age is : {self.age} loops"
+    return 
   
   
   ###########
