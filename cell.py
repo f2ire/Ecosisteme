@@ -26,7 +26,7 @@ class Cell:
   surface: float = 6 * width * length # m²
   volume: float = width * length * heigth # m³
   
-  nb_unit_width: int = round(width / EnvironmentUnit.width)
+  nb_unit_width : int = round(width / EnvironmentUnit.width) # 4x4 units in a single cell
   nb_unit_length: int = round(length / EnvironmentUnit.length)
 
   x: int
@@ -36,7 +36,9 @@ class Cell:
   color: tuple = birth_color
   death_color: tuple = (0, 0, 0)
 
-  display_tuple: tuple
+  display_widt: int  = 20 # pixels
+  display_length: int = 20 # pixels
+  display_tuple : tuple
 
   speed: float = 10**(-5) # m/s
   
@@ -59,7 +61,7 @@ class Cell:
     self.occupied_y_coord = np.array([y for y in range(math.floor(self.y), math.floor(self.y) + self.nb_unit_length)])#, EnvironmentalUnit.length)])
     environment.changeMultipleOccupationStates(self.occupied_x_coord, self.occupied_y_coord, True)
 
-    self.display_tuple = (self.x, self.y, self.width, self.length)
+    self.display_tuple = (self.x, self.y, self.display_width, self.display_length)
 
   def __repr__(self) -> str:
     return f"Cell at ({self.x}, {self.y})"
