@@ -21,14 +21,19 @@ class EnvironmentUnit:
     surface (float): surface of one unit, in m²
     volume (float): volume of one unit, in m³
     mass (float): total mass of one unit, calculated as it's a cube of water
+    display_width (int): width of the unit on the display windows in pixels
+    display_length (int): length of the unit on the display windows in pixels
     is_occupied (bool): True if the occupation unit is occupated by an entity of the environment, False if nothing lays in it
   """
-  width: int  = 25*10**(-8) # m
-  length: int = 25*10**(-8) # m 
-  height: int = 25*10**(-8) # m
+  width : int = 0.25*10**(-6) # m
+  length: int = 0.25*10**(-6) # m 
+  height: int = 0.25*10**(-6) # m
   surface: float = width * length # m²
-  volume: float =  width * length * height # m³
+  volume : float =  width * length * height # m³
   mass: float = volume * phy.WATER_DENSITY # kg
+
+  display_width : int = 5 # pixels
+  display_length: int = 5 # pixels
 
   is_occupied: bool = False
 
