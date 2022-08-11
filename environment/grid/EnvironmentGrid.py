@@ -1,5 +1,14 @@
 import math
-from environment.unit.EnvironmentUnit import EnvironmentUnit
+
+if __name__ == "__main__":
+    import os
+    import sys
+
+    currentdir = os.path.dirname(os.path.realpath(__file__))
+    parentdir = os.path.dirname(currentdir)
+    sys.path.append(parentdir)
+
+from unit.EnvironmentUnit import EnvironmentUnit
 
 
 class EnvironmentGrid:
@@ -168,6 +177,7 @@ class EnvironmentGrid:
 
 if __name__ == "__main__":
     environment_grid = EnvironmentGrid(3, 3)
+    print(environment_grid)
 
     # Print test
     # print(environment_grid) # OK

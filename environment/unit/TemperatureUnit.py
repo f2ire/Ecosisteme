@@ -1,5 +1,4 @@
-import physical_data as phy
-from EnvironmentUnit import EnvironmentUnit
+from EnvironmentUnit import EnvironmentUnit, phy
 import math
 
 
@@ -34,9 +33,9 @@ class TemperatureUnit(EnvironmentUnit):
             + f"Having a temperature of : {self.temperature} K\n"
         )
         string += (
-            f"Its color in RGB encoding is : ({self.color[0]:.2f}"
-            + f"{self.color[1]:.2f}"
-            + "{self.color[2]:.2f})\n"
+            f"Its color in RGB encoding is : ({self.color[0]:.2f},"
+            + f"{self.color[1]:.2f},"
+            + f"{self.color[2]:.2f})\n"
         )
         return string
 
