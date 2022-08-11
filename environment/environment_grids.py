@@ -1,6 +1,3 @@
-###########
-# MODULES #
-###########
 import math
 from environment_units import EnvironmentUnit, TemperatureUnit, GlucoseUnit
 import physical_data as phy
@@ -394,9 +391,6 @@ class GlucoseGrid:
                 )
 
 
-############
-# MAIN CODE #
-#############
 if __name__ == "__main__":
     environment_grid = EnvironmentGrid(3, 3)
 

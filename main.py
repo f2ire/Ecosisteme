@@ -1,18 +1,8 @@
-###########
-# MODULES #
-###########
 import pygame
 from world import World
 from cell import Cell
 import tools.data_logger as data_logger
 
-#############
-# FUNCTIONS #
-#############
-
-#############
-# MAIN CODE #
-#############
 # INITIALISATION
 pygame.init()  # Initiation of pygame -> mandatory
 

@@ -1,6 +1,3 @@
-###########
-# MODULES #
-###########
 import math
 import physical_data as phy
 
@@ -197,9 +194,6 @@ class GlucoseUnit(EnvironmentUnit):
         )
 
 
-#############
-# MAIN CODE #
-#############
 if __name__ == "__main__":
     test_occupation_unit = EnvironmentUnit()
     test_temperature_unit = TemperatureUnit(298.15)

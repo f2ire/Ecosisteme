@@ -1,6 +1,3 @@
-######################
-# PHYSICAL CONSTANTS #
-######################
 # Number of seconds flowing after each iteration of the game loop
 TIME_ITERATION: int = 10 ** (-2)
 PIXEL_METER_SCALE: float = 10 ** (-7)  # one pixel = 10⁻⁷ meter
@@ -20,10 +17,6 @@ GLUCOSE_MOLAR_MASS: float = 0.180156  # kg/mol
 WATER_DENSITY: float = 1.0 * 10**3  # kg/m³
 WATER_THERMAL_CONDUCTIVITY: float = 0.6  # W/m/K
 WATER_HEAT_CAPACITY: float = 4.185 * 10**3  # J/K/kg
-
-###########
-# METHODS #
-###########
 
 
 def computeThermalEnergy(thermal_flux: float) -> float:
@@ -84,9 +77,6 @@ def convertPixelsToMeters(pixels: int) -> float:
     return pixels * PIXEL_METER_SCALE
 
 
-#############
-# MAIN CODE #
-#############
 if __name__ == "__main__":
     # Glucose flux computation tests
     print(computeThermalEnergy(5) == 5 * TIME_ITERATION)  # OK

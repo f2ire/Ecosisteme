@@ -1,6 +1,3 @@
-###########
-# MODULES #
-###########
 from environment.environment_grids import EnvironmentGrid, TemperatureGrid, GlucoseGrid
 from environment.environment_units import EnvironmentUnit
 import pygame
@@ -73,9 +70,6 @@ class World:
         string += str(self.environment_grid)
         return string
 
-    ###########
-    # METHODS #
-    ###########
     def createUnitDisplayRectangle(self, x_position: int, y_position: int) -> tuple:
         """_summary_
 
@@ -138,9 +132,6 @@ class World:
         pygame.quit()
 
 
-#############
-# MAIN CODE #
-#############
 if __name__ == "__main__":
     the_world = World(40, 40)  # 40 x 40 units
     print(the_world)  # OK

@@ -1,6 +1,3 @@
-###########
-# MODULES #
-###########
 import math
 import random
 import numpy as np
@@ -45,9 +42,7 @@ class Cell:
     surface: float = 6 * width * length  # m²
     volume: float = width * length * heigth  # m³
 
-    nb_unit_width: int = round(
-        width / EnvironmentUnit.width
-    )  # 4x4 units in a single cell
+    nb_unit_width: int = round(width / EnvironmentUnit.width)
     nb_unit_length: int = round(length / EnvironmentUnit.length)
 
     x: float
@@ -109,9 +104,6 @@ class Cell:
         string += f"Occupied units coordinates along y axis : {self.occupied_y_coord}\n"
         return string
 
-    ###########
-    # METHODS #
-    ###########
     def isReplicationPossible(self) -> bool:
         """Takes a random number between 0 and 1 and checks if it is lower than the replication rate of the cell
 
@@ -230,9 +222,6 @@ class Cell:
         return None
 
 
-#############
-# MAIN CODE #
-#############
 if __name__ == "__main__":
     enviro = EnvironmentGrid(10, 10)
     cell1 = Cell(enviro)
