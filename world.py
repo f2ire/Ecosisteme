@@ -1,5 +1,7 @@
-from environment.environment_grids import EnvironmentGrid, TemperatureGrid, GlucoseGrid
-from environment.environment_units import EnvironmentUnit
+from environment.grid.EnvironmentGrid import EnvironmentGrid
+from environment.grid.GlucoseGrid import GlucoseGrid
+from environment.grid.TemperatureGrid import TemperatureGrid
+from environment.unit.EnvironmentUnit import EnvironmentUnit
 import pygame
 
 

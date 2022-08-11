@@ -1,8 +1,8 @@
 import math
 import random
 import numpy as np
-from environment.environment_grids import EnvironmentGrid
-from environment.environment_units import EnvironmentUnit
+from environment.grid.EnvironmentGrid import EnvironmentGrid
+from environment.unit.EnvironmentUnit import EnvironmentUnit
 from tools.direction import Direction
 import environment.physical_data as phy
 
@@ -66,9 +66,7 @@ class Cell:
     occupied_x_coord: np.array(int) = np.empty(shape=(nb_unit_width, nb_unit_length))
     occupied_y_coord: np.array(int) = np.empty(shape=(nb_unit_width, nb_unit_length))
 
-    def __init__(
-        self, environment: EnvironmentGrid, pos_x: float = 0, pos_y: float = 0
-    ):
+    def __init__(self, environment: EnvironmentGrid, pos_x: float = 0, pos_y: float = 0):
         # The starting position of the cell
         self.x = pos_x
         self.y = pos_y
