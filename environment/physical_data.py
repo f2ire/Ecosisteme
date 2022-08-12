@@ -70,10 +70,28 @@ def computeGlucoseFlux(mass_concentration1: float, mass_concentration2: float) -
 
 
 def convertMetersToPixels(meters: float) -> int:
+    """Conversion from a value in meters to a value in pixels, using
+    the constant PIXEL_METER_SCALE
+
+    Args:
+        meters (float): a number of meters
+
+    Returns:
+        int: pixel conversion of the meters argument
+    """
     return meters * 1 / PIXEL_METER_SCALE
 
 
 def convertPixelsToMeters(pixels: int) -> float:
+    """Conversion from a value in pixels to a value in meters, using
+    the constant PIXEL_METER_SCALE
+
+    Args:
+        pixels (int): a number of pixels
+
+    Returns:
+        float: meter conversion of the pixels argument
+    """
     return pixels * PIXEL_METER_SCALE
 
 
@@ -82,8 +100,5 @@ if __name__ == "__main__":
     print(computeThermalEnergy(5) == 5 * TIME_ITERATION)  # OK
     print(computeGlucoseFlux(5, 5) == 0)  # OK
     print(computeGlucoseFlux(0.001, 0.006) - 5.0127 < 10 ** (-6))  # OK
-    print(
-        computeGlucoseFlux(5 * 10 ** (-3), 7 * 10 ** (-3))
-        == 2 * TIME_ITERATION * 0.651 * 10 ** (-12)
-    )  # OK
+    print(computeGlucoseFlux(5 * 10 ** (-3), 7 * 10 ** (-3)))
     print(computeThermalFlux(350, 300) == -30)  # OK
