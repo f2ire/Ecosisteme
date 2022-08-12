@@ -1,6 +1,6 @@
 import pygame
-from World import World
-from Cell import Cell
+from world import World
+from cell import Cell
 import tools.data_logger as data_logger
 
 # INITIALISATION
