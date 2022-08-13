@@ -32,19 +32,17 @@ def computeThermalEnergy(thermal_flux: float) -> float:
     return thermal_flux * TIME_ITERATION
 
 
-def computeThermalFlux(temperature1: float, temperature2: float) -> float:
-    """Computes phi, the thermal flux from temperature1 to temperature2 in
-    W/m² according to Fourier's law of thermal diffusion
+def computeThermalFlux(temperature_difference: float) -> float:
+    """Computes phi, the thermal flux W according to Fourier's law of
+    thermal diffusion
 
     Args:
-        temperature1 (float): temperature, in K
-        temperature2 (float): temperature, in K
+        temperature_difference (float): in Kelvin
 
     Returns:
-        float: thermal flux, in W. Positive if temperature2 > temperature1,
-            negative otherwise.
+        float: thermal flux, in W.m⁻²
     """
-    return -WATER_THERMAL_CONDUCTIVITY * (temperature1 - temperature2)
+    return -WATER_THERMAL_CONDUCTIVITY * temperature_difference
 
 
 def computeGlucoseFlux(mass_concentration1: float, mass_concentration2: float) -> float:
@@ -96,9 +94,12 @@ def convertPixelsToMeters(pixels: int) -> float:
 
 
 if __name__ == "__main__":
-    # Glucose flux computation tests
+    # Thermal flux computation tests
     print(computeThermalEnergy(5) == 5 * TIME_ITERATION)  # OK
+    print(computeThermalFlux(-100))  # == WATER_THERMAL_CONDUCTIVITY * 100
+    # )  # OK
+
+    # Glucose flux computation tests
     print(computeGlucoseFlux(5, 5) == 0)  # OK
     print(computeGlucoseFlux(0.001, 0.006) - 5.0127 < 10 ** (-6))  # OK
     print(computeGlucoseFlux(5 * 10 ** (-3), 7 * 10 ** (-3)))
-    print(computeThermalFlux(350, 300) == -30)  # OK

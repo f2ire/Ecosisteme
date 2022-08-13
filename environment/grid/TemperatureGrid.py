@@ -69,9 +69,9 @@ class TemperatureGrid:
         Returns:
           TemperatureUnit: object of class TemperatureUnit
         """
-        return self.temperature_units_list[math.floor(position_x) % self.units_on_width][
-            math.floor(position_y) % self.units_on_length
-        ]
+        return self.temperature_units_list[
+            math.floor(position_x) % self.units_on_width
+        ][math.floor(position_y) % self.units_on_length]
 
     def computeAllTemperatureColors(self) -> None:
         """Adapt the color of every temperature units in the grid using their adaptTemperatureColor function"""
@@ -136,5 +136,5 @@ if __name__ == "__main__":
     print(temp_grid.getTemperatureUnit(2, 2))  # OK
 
     # Diffusing temperature test
-    # temp_grid.makeTemperatureDiffuse() # OK
-    # print(temp_grid)
+    temp_grid.makeTemperatureDiffuse()  # NOT OK
+    print(temp_grid)

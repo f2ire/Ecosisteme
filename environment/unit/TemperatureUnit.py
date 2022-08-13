@@ -64,10 +64,12 @@ class TemperatureUnit(EnvironmentUnit):
         energy
 
         Args:
-            thermal_flux (float): thermal flux the unit is receiving, in W
+            thermal_flux (float): thermal flux the unit is receiving, in W.m⁻²
         """
-        self.temperature += phy.computeThermalEnergy(thermal_flux) / (
-            self.mass * phy.WATER_HEAT_CAPACITY
+        self.temperature += (
+            phy.computeThermalEnergy(thermal_flux)
+            * self.surface
+            / (self.mass * phy.WATER_HEAT_CAPACITY)
         )
 
     def adaptTemperatureColor(self) -> None:
@@ -88,12 +90,16 @@ if __name__ == "__main__":
     print(test_temperature_unit)  # OK
 
     # Variable change tests
-    test_temperature_unit.changeTemperatureFromFlux(thermal_flux=0.5)
+    t_flux = 60  # Watt
+    test_temperature_unit.changeTemperatureFromFlux(thermal_flux=t_flux)
     print(
         test_temperature_unit.temperature
         == 298.15
-        + phy.computeThermalEnergy(0.5)
-        / (phy.WATER_HEAT_CAPACITY * phy.WATER_DENSITY * 8 * 10 ** (-9))
+        + t_flux
+        * phy.TIME_ITERATION
+        * 0.25
+        * 10 ** (-6)
+        / (test_temperature_unit.volume * phy.WATER_DENSITY * phy.WATER_HEAT_CAPACITY)
     )  # OK
     # Color adaptation test
     test_temperature_unit.adaptTemperatureColor()
