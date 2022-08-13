@@ -4,9 +4,10 @@ if __name__ == "__main__":
 
     currentdir = os.path.dirname(os.path.realpath(__file__))
     parentdir = os.path.dirname(currentdir)
-    sys.path.append(parentdir)
+    grandparentdir = os.path.dirname(parentdir)
+    sys.path.append(grandparentdir)
 
-import physical_data as phy
+import environment.physical_data as phy
 
 
 class EnvironmentUnit:

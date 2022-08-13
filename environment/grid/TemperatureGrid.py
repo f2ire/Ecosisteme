@@ -4,8 +4,10 @@ if __name__ == "__main__":
 
     currentdir = os.path.dirname(os.path.realpath(__file__))
     parentdir = os.path.dirname(currentdir)
-    sys.path.append(parentdir)
-from unit.TemperatureUnit import EnvironmentUnit, TemperatureUnit, math, phy
+    grandparentdir = os.path.dirname(parentdir)
+    sys.path.append(grandparentdir)
+
+from environment.unit.TemperatureUnit import EnvironmentUnit, TemperatureUnit, math, phy
 
 
 class TemperatureGrid:
