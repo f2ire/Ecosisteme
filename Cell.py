@@ -28,7 +28,7 @@ class Cell:
     display_length (int) : size of the length of the cell in the pygame window in pixels
     display_tuple (tuple): contains the information for a cell to be displayed on a pygame window,
       in this format ; (x, y, display_width, display_length)
-    speed (float): speed of the cell in meters by seconds
+    speed (float): speed of the cell in meters by seconds.
     replication_rate (float): probability of the cell to replicate in one iteration of the game loop
     age (int): actual age of the cell or the number of loops it has been living
     max_age (int): maximal age the cell can be
