@@ -1,5 +1,5 @@
 # Number of seconds flowing after each iteration of the game loop
-TIME_ITERATION: int = 10 ** (-2)
+TIME_ITERATION: int = 10 ** (-2)  # seconds
 PIXEL_METER_SCALE: float = 10 ** (-7)  # one pixel = 10⁻⁷ meter
 
 # Universal constants

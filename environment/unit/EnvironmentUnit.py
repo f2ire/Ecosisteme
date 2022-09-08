@@ -26,21 +26,21 @@ class EnvironmentUnit:
         surface (float): surface of one unit, in m²
         volume (float): volume of one unit, in m³
         mass (float): total mass of one unit, calculated as it's a cube of water
-        display_width (int): width of the unit on the display windows in pixels
-        display_length (int): length of the unit on the display windows in pixels
+        width (int): width of the unit on the display windows in pixels
+        length (int): length of the unit on the display windows in pixels
         is_occupied (bool): True if the unit is occupated by an entity of the environment,
             False if nothing lays in it
     """
 
-    width: int = 0.25 * 10 ** (-6)  # m
-    length: int = 0.25 * 10 ** (-6)  # m
-    height: int = 0.25 * 10 ** (-6)  # m
-    surface: float = width * length  # m²
-    volume: float = width * length * height  # m³
+    calculus_width: int = 0.25 * 10 ** (-6)  # m
+    calculus_length: int = 0.25 * 10 ** (-6)  # m
+    calculus_height: int = 0.25 * 10 ** (-6)  # m
+    surface: float = calculus_width * calculus_length  # m²
+    volume: float = calculus_width * calculus_length * calculus_height  # m³
     mass: float = volume * phy.WATER_DENSITY  # kg
 
-    display_width: int = phy.convertMetersToPixels(width)  # pixels
-    display_length: int = phy.convertMetersToPixels(length)  # pixels
+    width: int = 5  # pixels
+    length: int = 5  # pixels
 
     is_occupied: bool = False
 
@@ -49,7 +49,7 @@ class EnvironmentUnit:
 
     def __str__(self) -> str:
         string = f"Unit of volume {self.volume}m³\n"
-        string += f"Dimensions : {self.width}m x {self.length}m x {self.height}m\n"
+        string += f"Dimensions : {self.calculus_width}m x {self.calculus_length}m x {self.calculus_height}m\n"
         string += f"is_occupied : {self.is_occupied}\n"
         return string
 
@@ -68,5 +68,5 @@ if __name__ == "__main__":
     print(test_occupation_unit)  # OK
 
     # Display parameters verification
-    print(test_occupation_unit.display_width == 2.5)
-    print(test_occupation_unit.display_length == 2.5)
+    print(test_occupation_unit.width == 2.5)
+    print(test_occupation_unit.length == 2.5)

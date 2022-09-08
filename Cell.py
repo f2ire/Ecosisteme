@@ -1,14 +1,13 @@
-import math
 import random
-import numpy as np
 from environment.grid.EnvironmentGrid import EnvironmentGrid
-from environment.unit.EnvironmentUnit import EnvironmentUnit
 from tools.direction import Direction
-import environment.physical_data as phy
+
+# import environment.physical_data as phy
 
 
 class Cell:
-    """Class reprensenting a cellular individual as a colored cube, capable of movement and replication.
+    """Class reprensenting a cellular individual as a colored cube,
+    capable of movement and replication.
     The cell's color is changing along with its age.
 
     Attributes:
@@ -24,10 +23,10 @@ class Cell:
     birth_color (tuple): RGB tuple of the starting color of the cell, when the cell's age is 0
     color (tuple): actual RBG tuple of the cell's color
     death_color (tuple): RGB tuple the cell is closing by when it's aging
-    display_width (int): size of the width of the cell in the pygame window in pixels
-    display_length (int) : size of the length of the cell in the pygame window in pixels
-    display_tuple (tuple): contains the information for a cell to be displayed on a pygame window,
-      in this format ; (x, y, display_width, display_length)
+    width (int): size of the width of the cell in the pygame window in pixels
+    length (int) : size of the length of the cell in the pygame window in pixels
+    tuple (tuple): contains the information for a cell to be displayed on a pygame window,
+      in this format ; (x, y, width, length)
     speed (float): speed of the cell in meters by seconds.
     replication_rate (float): probability of the cell to replicate in one iteration of the game loop
     age (int): actual age of the cell or the number of loops it has been living
@@ -36,70 +35,55 @@ class Cell:
     occupied_y_coord (np.array): contains every coordinates along the y axis of the environmental units occupied by the cell
     """
 
-    width: float = 1 * 10 ** (-6)  # m
-    length: float = 1 * 10 ** (-6)  # m
-    heigth: float = 1 * 10 ** (-6)  # m
-    surface: float = 6 * width * length  # m²
-    volume: float = width * length * heigth  # m³
-
-    nb_unit_width: int = round(width / EnvironmentUnit.width)
-    nb_unit_length: int = round(length / EnvironmentUnit.length)
+    calculus_width: float = 1 * 10 ** (-6)  # m
+    calculus_length: float = 1 * 10 ** (-6)  # m
+    calculus_heigth: float = 1 * 10 ** (-6)  # m
+    surface: float = 6 * calculus_width * calculus_length  # m²
+    volume: float = calculus_width * calculus_length * calculus_heigth  # m³
+    width: int = 20  # pixels
+    length: int = 20  # pixels
 
     x: float
     y: float
+    total_x: float
+    total_y: float
+
+    ending_x: float
+    ending_y: float
 
     birth_color: tuple = (0, 12, 255)
     color: tuple = birth_color
     death_color: tuple = (0, 0, 0)
-    display_width: int = phy.convertMetersToPixels(width)  # pixels
-    display_length: int = phy.convertMetersToPixels(length)  # pixels
-    display_tuple: tuple
+    display_rect: tuple
 
-    speed: float = 10 ** (-5)  # m/s
+    speed: float = 5  # pixels.loop⁻¹
 
     replication_rate: float = 1 / 1000
 
     age: int = 0
-    max_age: int = 6000
+    max_age: int = 6000  # loops
 
-    # Square in the Environment grid used by the cell -> using np to fasten the computations
-    occupied_x_coord: np.array(int) = np.empty(shape=(nb_unit_width, nb_unit_length))
-    occupied_y_coord: np.array(int) = np.empty(shape=(nb_unit_width, nb_unit_length))
-
-    def __init__(self, environment: EnvironmentGrid, pos_x: float = 0, pos_y: float = 0):
+    def __init__(
+        self, environment: EnvironmentGrid, pos_x: float = 0, pos_y: float = 0
+    ):
         # The starting position of the cell
         self.x = pos_x
         self.y = pos_y
 
-        # Initialization of the space used by the cell in the environment grid
-        self.occupied_x_coord = np.array(
-            [
-                x
-                for x in range(
-                    math.floor(self.x), math.floor(self.x) + self.nb_unit_width
-                )
-            ]
-        )
-        self.occupied_y_coord = np.array(
-            [
-                y
-                for y in range(
-                    math.floor(self.y), math.floor(self.y) + self.nb_unit_length
-                )
-            ]
-        )
+        self.ending_x = self.x + self.width
+        self.ending_y = self.y + self.length
+
         environment.changeMultipleOccupationStates(
-            self.occupied_x_coord, self.occupied_y_coord, True
+            (self.x, self.y),
+            (self.x + self.width, self.y + self.length),
+            True,
         )
 
-        self.display_tuple = (self.x, self.y, self.display_width, self.display_length)
+        self.display_rect = (self.x, self.y, self.width, self.length)
 
     def __str__(self) -> str:
-        string = f"Cell at ({self.x}, {self.y})\n"
-        string += f"Its age is : {self.age} loops\n"
+        string = f"Cell's age is : {self.age} loops\n"
         string += f"Its color in RGB encoding is {self.color}\n"
-        string += f"Occupied units coordinates along x axis : {self.occupied_x_coord}\n"
-        string += f"Occupied units coordinates along y axis : {self.occupied_y_coord}\n"
         return string
 
     def isReplicationPossible(self) -> bool:
@@ -110,63 +94,57 @@ class Cell:
         """
         return random.random() <= self.replication_rate
 
-    def updateCoordinates(self, environment: EnvironmentGrid, movement: tuple) -> None:
-        """Adds the coordinates inside the movement tuple to the actual coordinates of the cell.
-        Updates the display_tuple attribute and the occupied lists.
-
-        Args:
-          environment (Environment): an object of the instance Environment from the environment.py module
-          movement (tuple): _description_
-        """
-        print(f"Tuple's movement : {movement}")
-        self.x = (self.x + movement[0]) % environment.units_on_width
-        self.y = (self.y + movement[1]) % environment.units_on_length
-
-        # Updating coordinates on the environmental grid.
-        self.occupied_x_coord = self.occupied_x_coord + movement[0]
-        self.occupied_y_coord = self.occupied_y_coord + movement[1]
-
-        self.display_tuple = (self.x, self.y, self.display_width, self.display_length)
-
     def deleteCellFromEnvironment(self, environment: EnvironmentGrid) -> None:
         environment.changeMultipleOccupationStates(
-            self.occupied_x_coord, self.occupied_y_coord, False
+            (self.x, self.y), (self.ending_x, self.ending_y), False
         )
 
     def addCellOnEnvironment(self, environment: EnvironmentGrid) -> None:
         environment.changeMultipleOccupationStates(
-            self.occupied_x_coord, self.occupied_y_coord, True
+            (self.x, self.y), (self.ending_x, self.ending_y), True
         )
 
     def moving(self, environment: EnvironmentGrid, direction: tuple = ()) -> None:
         """
-        This method makes the cell move in a random direction, after checking if the environment in the direction isn't occupied by others cells
+        This method makes the cell move in a random direction, after checking if
+        the environment in the direction isn't occupied by others cells
         The new coordinates are changed directly using UpdateSpace()
         Args :
-          environment (Environment): an object of the instance Environment from the environment.py module
-          direction (tuple): tuple containing the x and y coordinates of the movement
+            environment (Environment): an object of the instance Environment from
+                the environment.py module
+            direction (tuple): tuple containing the x and y coordinates of the movement
         """
         if direction == ():
             direction = Direction.getRandomDirection()
         else:
             pass
-        # print(direction)
 
-        x_movement = (
-            self.speed * phy.TIME_ITERATION * direction[0]
-        )  # Computes the potential coordinates of the cell
-        y_movement = self.speed * phy.TIME_ITERATION * direction[1]
+        self.deleteCellFromEnvironment(environment)
+
+        # Compute the potential coordinates of the cell
+        x_movement = self.speed * direction[0]
+        y_movement = self.speed * direction[1]
 
         is_space_for_moving = environment.isSpace(
-            self.occupied_x_coord, self.occupied_y_coord, (x_movement, y_movement)
+            (self.x, self.y), (self.ending_x, self.ending_y), (x_movement, y_movement)
         )
-        print("The cell is moving : ", is_space_for_moving)
+
+        # print("The cell is moving : ", is_space_for_moving)
 
         if is_space_for_moving:
-            self.updateCoordinates(environment, (x_movement, y_movement))
-        else:
-            pass
-        return None
+            self.x = self.x + x_movement
+            self.y = self.y + y_movement
+            self.ending_x = self.ending_x + x_movement
+            self.ending_y = self.ending_y + y_movement
+
+            self.display_rect = (
+                self.x,
+                self.y,
+                self.width,
+                self.length,
+            )
+
+        self.addCellOnEnvironment(environment)
 
     def replicating(self, environment: EnvironmentGrid):
         """
@@ -183,7 +161,9 @@ class Cell:
                 self.length * random_direction[1],
             )
             is_space_for_replication = environment.isSpace(
-                self.occupied_x_coord, self.occupied_y_coord, needed_replication_space
+                (self.x, self.y),
+                (self.ending_x, self.ending_y),
+                needed_replication_space,
             )
             # print("is_space :",is_space)
             if is_space_for_replication:
@@ -223,32 +203,21 @@ class Cell:
 if __name__ == "__main__":
     enviro = EnvironmentGrid(10, 10)
     cell1 = Cell(enviro)
+    cell2 = Cell(enviro, 25.45, 0)
     print(cell1)  # OK
     print(enviro)  # OK
-
-    # Display parameters verification
-    print(cell1.display_width == 10)  # OK
-    print(cell1.display_length == 10)  # OK
 
     # Age test
     cell1.age = 7000
     print(cell1.isTooOld())  # OK
 
-    # Update coordinates test
-    cell1.updateCoordinates(enviro, (1, 3))
-    print(cell1.x == 1)  # OK
-    print(cell1.y == 3)  # OK
-    print(cell1.display_tuple == (1, 3, 10, 10))  # OK
-    print(cell1.occupied_x_coord == np.array([list(range(1, 5))]))  # OK
-    print(cell1.occupied_y_coord == np.array([list(range(3, 7))]))  # OK
-
-    cell1.deleteCellFromEnvironment(enviro)
-    cell1.moving(enviro, (0, 1))
-    cell1.addCellOnEnvironment(enviro)
-    print(cell1)
-
-    # Movement tests
-    # for i in range(10):
-    #  cell1.moving(enviro) #OK
-    #  print(enviro)
-    #  time.sleep(1)
+    # Movements and collision tests
+    for i in range(10):
+        cell1.moving(enviro, (1, 0))
+        print(
+            f"Cell 1 from ({cell1.x % 50}, {cell1.y % 50}) to ({cell1.ending_x % 50}, {cell1.ending_y % 50})"
+        )
+        print(
+            f"Cell 2 from ({cell2.x % 50}, {cell2.y % 50}) to ({cell2.ending_x % 50}, {cell2.ending_y % 50})"
+        )
+        print(enviro)
