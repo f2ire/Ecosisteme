@@ -11,43 +11,44 @@ class Cell:
     The cell's color is changing along with its age.
 
     Attributes:
-    width (float) : size of the width of the cell in meters
-    length (float): size of the length of the cell in meters
-    height (float): size of the heigth of the cell in meters
+    calculus_width (float) : size of the width of the cell in meters
+    calculus_length (float): size of the length of the cell in meters
+    calculus_height (float): size of the heigth of the cell in meters
     surface (float): surface of one face of the cell in m²
     volume (float) : volume of the cell in m³
-    nb_unit_width (int) : total number of environment units contained in the width of the cell
-    nb_unit_length (int): total number of environment units contained in the length of the cell
     x (float): coordinates along the x axis of the cell
     y (float): coordinates along the y axis of the cell
+    display_x (float): coordinate along the x axis used to display the cell on the pygame window
+    display_y (float): coordinate along the Y axis used to display the cell on the pygame window
+    ending_x (float): coordinate along the x axis of bottom right corner of the cell
+    ending_y (float): coordinate along the y axis of bottom right corner of the cell
     birth_color (tuple): RGB tuple of the starting color of the cell, when the cell's age is 0
     color (tuple): actual RBG tuple of the cell's color
     death_color (tuple): RGB tuple the cell is closing by when it's aging
     width (int): size of the width of the cell in the pygame window in pixels
     length (int) : size of the length of the cell in the pygame window in pixels
-    tuple (tuple): contains the information for a cell to be displayed on a pygame window,
+    display_rect (tuple): contains the information for a cell to be displayed on a pygame window,
       in this format ; (x, y, width, length)
-    speed (float): speed of the cell in meters by seconds.
+    speed (float): speed of the cell in pixel.loop⁻¹.
     replication_rate (float): probability of the cell to replicate in one iteration of the game loop
     age (int): actual age of the cell or the number of loops it has been living
     max_age (int): maximal age the cell can be
-    occupied_x_coord (np.array): contains every coordinates along the x axis of the environmental units occupied by the cell
-    occupied_y_coord (np.array): contains every coordinates along the y axis of the environmental units occupied by the cell
     """
 
     calculus_width: float = 1 * 10 ** (-6)  # m
     calculus_length: float = 1 * 10 ** (-6)  # m
     calculus_heigth: float = 1 * 10 ** (-6)  # m
+
     surface: float = 6 * calculus_width * calculus_length  # m²
     volume: float = calculus_width * calculus_length * calculus_heigth  # m³
+
     width: int = 20  # pixels
     length: int = 20  # pixels
 
     x: float
     y: float
-    total_x: float
-    total_y: float
-
+    display_x: float
+    display_y: float
     ending_x: float
     ending_y: float
 
@@ -69,6 +70,8 @@ class Cell:
         # The starting position of the cell
         self.x = pos_x
         self.y = pos_y
+        self.display_x = pos_x
+        self.display_y = pos_y
 
         self.ending_x = self.x + self.width
         self.ending_y = self.y + self.length
@@ -95,11 +98,23 @@ class Cell:
         return random.random() <= self.replication_rate
 
     def deleteCellFromEnvironment(self, environment: EnvironmentGrid) -> None:
+        """Change every Environment units' is_occupied attribute the cell is currently lying over
+        on False
+
+        Args:
+            environment (EnvironmentGrid): object of class EnvironmentGrid
+        """
         environment.changeMultipleOccupationStates(
             (self.x, self.y), (self.ending_x, self.ending_y), False
         )
 
     def addCellOnEnvironment(self, environment: EnvironmentGrid) -> None:
+        """Change every Environment units' is_occupied attribute the cell is currently lying over
+        on True
+
+        Args:
+            environment (EnvironmentGrid): object of class EnvironmentGrid
+        """
         environment.changeMultipleOccupationStates(
             (self.x, self.y), (self.ending_x, self.ending_y), True
         )
@@ -132,14 +147,16 @@ class Cell:
         # print("The cell is moving : ", is_space_for_moving)
 
         if is_space_for_moving:
-            self.x = self.x + x_movement
-            self.y = self.y + y_movement
-            self.ending_x = self.ending_x + x_movement
-            self.ending_y = self.ending_y + y_movement
+            self.x += x_movement
+            self.y += y_movement
+            self.display_x = (self.display_x + x_movement) % environment.width
+            self.display_y = (self.display_y + y_movement) % environment.length
+            self.ending_x += x_movement
+            self.ending_y += y_movement
 
             self.display_rect = (
-                self.x,
-                self.y,
+                self.display_x,
+                self.display_y,
                 self.width,
                 self.length,
             )
