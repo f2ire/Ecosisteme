@@ -32,15 +32,13 @@ class EnvironmentUnit:
             False if nothing lays in it
     """
 
-    calculus_width: int = 0.25 * 10 ** (-6)  # m
-    calculus_length: int = 0.25 * 10 ** (-6)  # m
-    calculus_height: int = 0.25 * 10 ** (-6)  # m
-    surface: float = calculus_width * calculus_length  # m²
-    volume: float = calculus_width * calculus_length * calculus_height  # m³
-    mass: float = volume * phy.WATER_DENSITY  # kg
+    side_length: int = 5  # in pixels
 
-    width: int = 5  # pixels
-    length: int = 5  # pixels
+    side_length_calculus: float = phy.convertPixelsToMeters(side_length) * 10**6  # um
+
+    surface: float = side_length**2  # um²
+    volume: float = side_length**3  # um³
+    mass: float = volume * phy.WATER_DENSITY  # ug
 
     is_occupied: bool = False
 
@@ -49,7 +47,7 @@ class EnvironmentUnit:
 
     def __str__(self) -> str:
         string = f"Unit of volume {self.volume}m³\n"
-        string += f"Dimensions : {self.calculus_width}m x {self.calculus_length}m x {self.calculus_height}m\n"
+        string += f"Dimensions : {self.side_length_calculus}m x {self.side_length_calculus}m x {self.side_length_calculus}m\n"
         string += f"is_occupied : {self.is_occupied}\n"
         return string
 
@@ -68,5 +66,5 @@ if __name__ == "__main__":
     print(test_occupation_unit)  # OK
 
     # Display parameters verification
-    print(test_occupation_unit.width == 2.5)
-    print(test_occupation_unit.length == 2.5)
+    print(test_occupation_unit.side_length == 2.5)
+    print(test_occupation_unit.side_length == 2.5)

@@ -40,11 +40,13 @@ class EnvironmentGrid:
     def __init__(self, nb_units_width: int, nb_units_length: int) -> None:
         self.units_on_width, self.units_on_length = nb_units_width, nb_units_length
 
-        self.calculus_width = self.units_on_width * EnvironmentUnit.calculus_width
-        self.calculus_length = self.units_on_length * EnvironmentUnit.calculus_length
+        self.calculus_width = self.units_on_width * EnvironmentUnit.side_length_calculus
+        self.calculus_length = (
+            self.units_on_length * EnvironmentUnit.side_length_calculus
+        )
 
-        self.width = self.units_on_width * EnvironmentUnit.width
-        self.length = self.units_on_length * EnvironmentUnit.length
+        self.width = self.units_on_width * EnvironmentUnit.side_length
+        self.length = self.units_on_length * EnvironmentUnit.side_length
 
         self.environment_units_list = [
             [EnvironmentUnit() for i in range(self.units_on_width)]
@@ -86,8 +88,8 @@ class EnvironmentGrid:
           EnvironmentUnit: object of class EnvironmentUnit
         """
         return self.environment_units_list[
-            position_x // EnvironmentUnit.width % self.units_on_width
-        ][position_y // EnvironmentUnit.length % self.units_on_length]
+            position_x // EnvironmentUnit.side_length % self.units_on_width
+        ][position_y // EnvironmentUnit.side_length % self.units_on_length]
 
     def changeMultipleOccupationStates(
         self,
@@ -106,12 +108,12 @@ class EnvironmentGrid:
         for x in range(
             math.floor(starting_coor[0]),
             math.ceil(ending_coor[0]),
-            EnvironmentUnit.width,
+            EnvironmentUnit.side_length,
         ):
             for y in range(
                 math.floor(starting_coor[1]),
                 math.ceil(ending_coor[1]),
-                EnvironmentUnit.length,
+                EnvironmentUnit.side_length,
             ):
                 self.getEnvironmentUnit(x, y).changeOccupationState(occupation_state)
 
@@ -136,12 +138,12 @@ class EnvironmentGrid:
         for x in range(
             math.floor(starting_coor[0]),
             math.ceil(ending_coor[0]),
-            EnvironmentUnit.width,
+            EnvironmentUnit.side_length,
         ):
             for y in range(
                 math.floor(starting_coor[1]),
                 math.ceil(ending_coor[1]),
-                EnvironmentUnit.length,
+                EnvironmentUnit.side_length,
             ):
                 if self.getEnvironmentUnit(x, y).is_occupied:
                     return False

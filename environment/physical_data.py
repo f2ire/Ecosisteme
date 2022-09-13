@@ -3,20 +3,20 @@ TIME_ITERATION: int = 10 ** (-2)  # seconds
 PIXEL_METER_SCALE: float = 10 ** (-7)  # one pixel = 10⁻⁷ meter
 
 # Universal constants
-NA: float = 6.02214076 * 10**23  # Avogadero constant -> mol-1
-R: float = 8.31446261815324  # Gas constant -> J/K/mol
-KB: float = 1.380649 * 10 ** (-23)  # Boltzmann constant -> J/mol
+NA: float = 6.02214076 * 10**23  # Avogadero constant -> mol⁻¹
+R: float = 8.31446261815324  # Gas constant -> J.K⁻¹.mol⁻¹
+KB: float = 1.380649 * 10 ** (-23)  # Boltzmann constant -> J.mol⁻¹
 
 # Glucose constants
 # taken as constant for T = 298.15 K, in m²/s
 GLUCOSE_DIFFUSION_COEFFICIENT: float = 0.651 * 10 ** (-9)
-GLUCOSE_DENSITY: float = 1.54 * 10**3  # kg/m³
-GLUCOSE_MOLAR_MASS: float = 0.180156  # kg/mol
+GLUCOSE_DENSITY: float = 1.54 * 10**3  # kg.m⁻³
+GLUCOSE_MOLAR_MASS: float = 0.180156  # kg.mol⁻¹
 
 # Water constants
-WATER_DENSITY: float = 1.0 * 10**3  # kg/m³
-WATER_THERMAL_CONDUCTIVITY: float = 0.6  # W/m/K
-WATER_HEAT_CAPACITY: float = 4.185 * 10**3  # J/K/kg
+WATER_DENSITY: float = 1.0 * 10**3  # kg.m⁻³
+WATER_THERMAL_CONDUCTIVITY: float = 0.6  # W.m⁻¹.K⁻¹
+WATER_HEAT_CAPACITY: float = 4.185 * 10**3  # J.K⁻¹.kg⁻¹
 
 
 def computeThermalEnergy(thermal_flux: float) -> float:

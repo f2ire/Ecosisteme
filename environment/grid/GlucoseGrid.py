@@ -7,7 +7,8 @@ if __name__ == "__main__":
     grandparentdir = os.path.dirname(parentdir)
     sys.path.append(grandparentdir)
 
-from environment.unit.GlucoseUnit import EnvironmentUnit, GlucoseUnit, math
+import math
+from environment.unit.GlucoseUnit import EnvironmentUnit, GlucoseUnit
 import environment.physical_data as phy
 
 
@@ -33,8 +34,8 @@ class GlucoseGrid:
 
     def __init__(self, col_nb: int, row_nb: int, initial_glucose: float = 0) -> None:
         self.units_on_width, self.units_on_length = col_nb, row_nb
-        self.width = self.units_on_width * EnvironmentUnit.width
-        self.length = self.units_on_length * EnvironmentUnit.length
+        self.width = self.units_on_width * EnvironmentUnit.side_length
+        self.length = self.units_on_length * EnvironmentUnit.side_length
 
         self.glucose_units_list = [
             [GlucoseUnit(initial_glucose) for i in range(self.units_on_width)]
@@ -67,9 +68,9 @@ class GlucoseGrid:
         Returns:
           GlucoseUnit: object of class GlucoseUnit
         """
-        return self.glucose_units_list[math.floor(position_x) % self.units_on_width][
-            math.floor(position_y) % self.units_on_length
-        ]
+        return self.glucose_units_list[
+            position_x // EnvironmentUnit.side_length % self.units_on_width
+        ][position_y // EnvironmentUnit.side_length % self.units_on_length]
 
     def changeMultipleGlucoseConcentration(
         self, xlist, ylist, new_glucose_concentration: float
@@ -94,6 +95,33 @@ class GlucoseGrid:
         for row in self.glucose_units_list:
             for glu_unit in row:
                 glu_unit.adaptGlucoseColor()
+
+    def computeTotalGlucoseQuantity(
+        self, starting_coor: tuple, ending_coor: tuple
+    ) -> float:
+        """Returns the total mass of glucose contained in the glucose units between
+        the starting and ending coordinates of the grid.
+
+        Args:
+            starting_coor (tuple): contains the (x, y) coordinates of an entity
+            ending_coor (tuple): contains the (ending_x, ending_y) coordinates of and entity
+
+        Returns:
+            float: mass of glucose, in kg, contained in all the glucose units
+        """
+        glucose_total_mass = 0
+        for x in range(
+            math.floor(starting_coor[0]),
+            math.ceil(ending_coor[0]),
+            GlucoseUnit.side_length,
+        ):
+            for y in range(
+                math.floor(starting_coor[1]),
+                math.ceil(ending_coor[1]),
+                GlucoseUnit.side_length,
+            ):
+                glucose_total_mass += self.getGlucoseUnit(x, y).computeGlucoseQuantity()
+        return glucose_total_mass
 
     def makeGlucoseDiffuse(self) -> None:
         """Cross every glucose unit in the glucose grid and diffuses the glucose.

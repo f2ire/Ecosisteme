@@ -29,7 +29,7 @@ class GlucoseUnit(EnvironmentUnit):
 
     def __init__(self, initial_concentration: float) -> None:
         """
-        initial_concentration (float): initial glucose concentration, in kg/m³
+        initial_concentration (float): initial glucose concentration, in ug.mL⁻¹
         """
         super().__init__()
         self.glucose_concentration = initial_concentration
@@ -39,7 +39,7 @@ class GlucoseUnit(EnvironmentUnit):
         string = (
             "Glucose "
             + super().__str__()
-            + f"Having a glucose concentration of : {self.glucose_concentration} kg.m⁻³\n"
+            + f"Having a glucose concentration of : {self.glucose_concentration} ug.mL⁻¹\n"
         )
         string += (
             f"Its color in RGB encoding is : ({self.color[0]:.2f}"
@@ -48,13 +48,21 @@ class GlucoseUnit(EnvironmentUnit):
         )
         return string
 
+    def computeGlucoseQuantity(self) -> float:
+        """Returns the mass of glucose contained in the Glucose unit
+
+        Returns:
+            float: mass of glucose, in ug, contained in the Glucose unit
+        """
+        return self.glucose_concentration * self.volume
+
     def changeGlucoseConcentration(self, new_glucose_concentration: float) -> None:
         """Replaces the actual glucose concentration of the unit by
         new_glucose_concentration.
 
         Args:
           new_glucose_concentration (float): concentration of glucose transiting through
-              the unit, in kg/m³.
+              the unit, in ug.mL⁻¹.
         """
         self.glucose_concentration = new_glucose_concentration
 
@@ -63,7 +71,7 @@ class GlucoseUnit(EnvironmentUnit):
         mass of glucose.
 
         Args:
-          glucose_flux (float): flux of glucose transiting through the unit, in kg/m².
+          glucose_flux (float): flux of glucose transiting through the unit, in ug.mL⁻¹.
               Positive if the unit is receiving glucose, negative if it's losing
         """
         self.glucose_concentration += glucose_flux * self.surface / self.volume

@@ -1,5 +1,6 @@
 import random
 from environment.grid.EnvironmentGrid import EnvironmentGrid
+from environment.grid.GlucoseGrid import GlucoseGrid
 from tools.direction import Direction
 
 # import environment.physical_data as phy
@@ -64,6 +65,11 @@ class Cell:
     age: int = 0
     max_age: int = 6000  # loops
 
+    energy: int
+
+    glucose_tolerance: float = 1  # betwenn 0 and 1
+    glucose_permeability: float = 1  # between 0 and 1
+
     def __init__(
         self, environment: EnvironmentGrid, pos_x: float = 0, pos_y: float = 0
     ):
@@ -118,6 +124,14 @@ class Cell:
         environment.changeMultipleOccupationStates(
             (self.x, self.y), (self.ending_x, self.ending_y), True
         )
+
+    def convertGlucoseIntoEnergy(self, mass_glucose: float):
+        """_summary_
+
+        Args:
+            mass_glucose (float): _description_
+        """
+        self.energy
 
     def moving(self, environment: EnvironmentGrid, direction: tuple = ()) -> None:
         """
