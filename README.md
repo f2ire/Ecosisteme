@@ -45,13 +45,6 @@ The simulation uses realistic physical models with metric units for cell size (�
 * **Data Logger**: Recording and visualization of metrics
 * **Modularity**: Extensible object-oriented architecture
 
-## 🚀 Technologies
-
-* Python 3.8+
-* Pygame 2.0+ (graphics)
-* Matplotlib 3.0+ (data visualization)
-* NumPy 1.19+ (scientific computations)
-
 ## 🔧 Installation
 
 ### Prerequisites
@@ -75,11 +68,6 @@ python main.py
 
 ## 🎮 Usage
 
-### Quick Start
-
-```bash
-python main.py
-```
 
 ### Simulation Parameters
 
@@ -133,11 +121,3 @@ Integrated logging captures:
 * **Population**: Number of cells over time
 * **Dynamics**: Births, deaths, movements
 * **Graphs**: Automated visualization via Matplotlib
-
-## 📜 License
-
-This project is under the MIT License. See `LICENSE` for details.
-
----
-
-*For more technical information, consult the code documentation or open an issue.*
